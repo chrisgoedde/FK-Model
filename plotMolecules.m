@@ -1,7 +1,8 @@
 function plotMolecules(varargin)
 
-[ ~, ~, ~, ~, ~, f0, ~, ~, ~, ~, geometry, runNumber, ...
-    pathFormats, pathValues ] = parseArguments(varargin{:});
+[ pathFormats, pathValues, runNumber ] = parseArguments(varargin{:});
+
+load(FKDefaults, 'f0', 'geometry')
 
 readPathName = makePath(pathFormats, pathValues, []);
 
@@ -9,9 +10,9 @@ alpha = [];
 gamma = [];
 beta = [];
 
-if ~PathExists(readPathName)
+if ~PathExists(sprintf('%s/%sConstants.mat', readPathName, geometry))
     
-    fprintf('Path %s does not exist.\n', readPathName);
+    fprintf('No appropriate run at %s.\n', readPathName);
     return
     
 end
@@ -20,7 +21,7 @@ load(sprintf('%s/%sConstants.mat', readPathName, geometry));
 
 [ ~, phi, rho ] = loadDynamics(readPathName, geometry, runNumber);
 
-theTitle = makePlotTitle(alpha, gamma, varargin{:});
+theTitle = makePlotTitle(alpha, gamma, runNumber);
 
 [ ~, offset, ~, ~, ~, ~, ~, ~, ~ ] = processChain(phi, rho, wavelengthFactor, alpha, delta, gamma, beta, epsilon);
 

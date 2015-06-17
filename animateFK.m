@@ -10,9 +10,9 @@ load(FKDefaults, 'geometry')
 
 readPathName = makePath(pathFormats, pathValues, []);
 
-if ~PathExists(readPathName)
+if ~PathExists(sprintf('%s/%sConstants.mat', readPathName, geometry))
     
-    fprintf('Path %s does not exist.\n', readPathName);
+    fprintf('No appropriate run at %s.\n', readPathName);
     return
     
 end
