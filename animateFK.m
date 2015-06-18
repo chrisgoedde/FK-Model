@@ -73,11 +73,17 @@ if isempty(movieFileName)
 else
     
     startAnimation([], true)
-    movieFileName = sprintf('../Movies/%s', movieFileName);
     
-    addFrame(1, fH, movieFileName)
     frame = 1;
 
+    gifFileName = sprintf('../Movies/%s.gif', movieFileName);
+    addFrameToGIF(frame, fH, gifFileName)
+    
+    mp4FileName = sprintf('../Movies/%s.mp4', movieFileName);
+    mp4Object = VideoWriter(mp4FileName, 'MPEG-4');
+    open(mp4Object);
+    writeVideo(mp4Object, getframe(fH));
+    
 end
 
 for i = 2:size(stretch, 2)
@@ -96,8 +102,11 @@ for i = 2:size(stretch, 2)
         
         drawnow;
         if ishandle(fH)
+            
             frame = frame + 1;
-            addFrame(frame, fH, movieFileName)
+            addFrameToGIF(frame, fH, gifFileName)
+            writeVideo(mp4Object, getframe(fH));
+
         end
         
     else
@@ -105,6 +114,12 @@ for i = 2:size(stretch, 2)
         pause(0.05);
         
     end
+    
+end
+
+if ~isempty(movieFileName)
+    
+    close(mp4Object)
     
 end
 
