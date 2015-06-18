@@ -87,7 +87,7 @@ title(sprintf('%d molecules, gamma = %.2f', N0, gamma(end)))
 
 legend(legendArray, 'location', 'best')
 
-SetPrintSize(8, 6, true)
-MakePrint('../Pictures', 'EvA2', 'pdf', true)
+setPrintSize(8, 6, true)
+makePrint('../Pictures', 'EvA2', 'pdf', true)
 
 end

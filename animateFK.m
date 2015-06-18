@@ -10,7 +10,7 @@ load(FKDefaults, 'geometry')
 
 readPathName = makePath(pathFormats, pathValues, []);
 
-if ~PathExists(sprintf('%s/%sConstants.mat', readPathName, geometry))
+if ~exist(sprintf('%s/%sConstants.mat', readPathName, geometry), 'file')
     
     fprintf('No appropriate run at %s.\n', readPathName);
     return
@@ -27,7 +27,7 @@ theTitle = makePlotTitle(alpha, gamma, runNumber);
 
 moleculeIndex = (1:N)';
 
-fH = figure('KeyPressFcn', @AnimationHandler);
+fH = figure('KeyPressFcn', @startAnimation);
 
 % p = plot(moleculeIndex, stretch(:, 1), 'o');
 % p = plot(moleculeIndex, (offset(:, 1)-mean(offset(:, 1)))/(4*pi), 'o');
@@ -66,7 +66,7 @@ set(handle, 'fontsize', 14)
 
 title(theTitle)
 
-AnimationHandler([], false)
+startAnimation([], false)
 
 for i = 2:size(stretch, 2)
     

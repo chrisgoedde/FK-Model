@@ -5,7 +5,7 @@ numSets = 1;
 while true
     
     fileName = sprintf('%s/%sDynamics-%d.mat', newPathName, geometry, numSets);
-    if PathExists(fileName)
+    if exists(fileName, 'file')
         
         fprintf('Loading file %s\n', fileName)
         [ ~, ~, ~, ~, rhoAvg] = loadDynamics(newPathName, geometry, numSets);

@@ -66,7 +66,7 @@ for n = 1:length(N0Vec)
             
             fprintf('Looking for path %s\n', newPathName)
             
-            if PathExists(newPathName)
+            if exist(newPathName, 'file')
                 
                 fprintf('Loading file %s/ringConstants.mat\n', newPathName)
                 load(sprintf('%s/ringConstants.mat', newPathName), 'p0', 'mAvg', 'a', 'g')

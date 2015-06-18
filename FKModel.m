@@ -31,8 +31,8 @@ if theType == 4 || theType == 5 || theType == 6
     
 else
     
-        disp('Nanotube type must be 4, 5, or 6.')
-        return
+    disp('Nanotube type must be 4, 5, or 6.')
+    return
 
 end
 

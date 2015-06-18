@@ -12,7 +12,7 @@ beta = [];
 
 fontSize = 14;
 
-if ~PathExists(sprintf('%s/%sConstants.mat', readPathName, geometry))
+if ~exist(sprintf('%s/%sConstants.mat', readPathName, geometry), 'file')
     
     fprintf('No appropriate run at %s.\n', readPathName);
     return

@@ -86,7 +86,7 @@ title(sprintf('%d molecules, a/lambda = %.2f', N0, alpha(end)/(2*pi)))
 
 legend(legendArray, 'location', 'best')
 
-SetPrintSize(8, 6, true)
-MakePrint('../Pictures', 'EvG', 'pdf', true)
+setPrintSize(8, 6, true)
+makePrint('../Pictures', 'EvG', 'pdf', true)
 
 end

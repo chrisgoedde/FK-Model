@@ -1,6 +1,6 @@
 function saveDynamics(thePath, geometry, runNumber, tau, phi, rho, phiAvg, rhoAvg) %#ok<INUSD>
 
-if ~PathExists(thePath)
+if ~exist(thePath, 'dir')
     
     mkdir(thePath);
     

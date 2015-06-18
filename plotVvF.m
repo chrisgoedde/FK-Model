@@ -41,7 +41,7 @@ for j = 1:length(bathTempList)
         newPathName = makePath(pathFormats, pathValues, []);
         
         fprintf('Looking for path %s\n', newPathName)
-        if PathExists(newPathName)
+        if exist(newPathName, 'file')
             
             fprintf('Loading file %s/ringConstants.mat\n', newPathName)
             load(sprintf('%s/ringConstants.mat', newPathName), 'p0', 'mAvg', 'a', 'g')
