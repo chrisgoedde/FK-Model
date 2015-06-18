@@ -1,15 +1,27 @@
-function thePath = makePath(pathFormats, pathValues, num)
+function thePath = makePath(pathFormats, pathValues, theString)
 
 thePath = '..';
 
-if isempty(num)
+num = length(pathFormats);
+
+if ~isempty(theString)
     
-    num = length(pathFormats);
+    for i = 1:num
+        
+        nextFormat = pathFormats{i};
+        if strcmp(theString, nextFormat(1:length(theString)))
+            
+            num = i;
+            break
+            
+        end
+        
+    end
     
 end
 
 for i = 1:num
-
+    
     nextFolder = sprintf(pathFormats{i}, pathValues{i});
     thePath = sprintf('%s/%s', thePath, nextFolder);
     

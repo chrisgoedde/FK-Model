@@ -8,7 +8,7 @@ beta = [];
 
 geometryList = { 'flat', 's1', 's2', 's3', 's4', 's5', 's6' };
 
-topPathName = makePath(pathFormats, pathValues, 8);
+topPathName = makePath(pathFormats, pathValues, 'spring =');
 
 fileList = dir(topPathName);
 

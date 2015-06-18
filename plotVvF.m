@@ -4,7 +4,7 @@ function plotVvF(varargin)
 
 load(FKDefaults, 'N0', 'eta', 'S', 'geometry')
 
-topPathName = makePath(pathFormats, pathValues, 4);
+topPathName = makePath(pathFormats, pathValues, 'eta =');
 
 fileList = dir(topPathName);
 
@@ -26,7 +26,7 @@ for j = 1:length(bathTempList)
     
     pathValues{5} = bathTempList(j);
     
-    midPathName = makePath(pathFormats, pathValues, 6);
+    midPathName = makePath(pathFormats, pathValues, 'S =');
     fileList = dir(midPathName);
     
     [ forceList, ~ ] = getFoldersAndValues(fileList, 'f =');

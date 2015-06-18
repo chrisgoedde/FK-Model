@@ -3,7 +3,7 @@ function plotVvS(varargin)
 [ ~, ~, eta, ~, ~, f0, ~, ~, ~, ~, geometry, ~, ...
     pathFormats, pathValues ] = parseArguments(varargin{:});
 
-topPathName = makePath(pathFormats, pathValues, 2);
+topPathName = makePath(pathFormats, pathValues, 'type =');
 
 fileList = dir(topPathName);
 
@@ -29,7 +29,7 @@ for n = 1:length(N0Vec)
     pathValues{3} = N0;
     needTheoryLegend = true;
     
-    topPathName = makePath(pathFormats, pathValues, 4);
+    topPathName = makePath(pathFormats, pathValues, 'eta = ');
     
     fileList = dir(topPathName);
     
@@ -48,7 +48,7 @@ for n = 1:length(N0Vec)
         
         pathValues{5} = bathTempList(j);
         
-        midPathName = makePath(pathFormats, pathValues, 5);
+        midPathName = makePath(pathFormats, pathValues, 'T =');
         fileList = dir(midPathName);
         
         [ sList, sFolder ] = getFoldersAndValues(fileList, 'S =');
