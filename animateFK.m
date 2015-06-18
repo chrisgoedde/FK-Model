@@ -1,4 +1,4 @@
-function animateFK(movieFileName, varargin)
+function animateFK(saveMovie, varargin)
 
 alpha = [];
 gamma = [];
@@ -23,7 +23,7 @@ load(sprintf('%s/%sConstants.mat', readPathName, geometry));
 
 [ stretch, offset, ~, ~, ~, ~, ~, ~, ~ ] = processChain(phi, rho, wavelengthFactor, alpha, delta, gamma, beta, epsilon);
 
-theTitle = makeAnimationTitle(alpha, gamma, runNumber);
+theTitle = makeAnimationTitle(alpha, beta, gamma, runNumber);
 
 moleculeIndex = (1:N)';
 
@@ -39,20 +39,16 @@ grid on
 box on
 set(gca, 'fontsize', 14)
 xlabel('molecule number')
-% ylabel('stretch (arb)')
-% ylabel('soliton shape')
 ylabel('(z_n - n\lambda)/\lambda')
-% set(gca, 'ylim', [ min(stretch(:, 1))*1.25 max(stretch(:, 1))*0.8 ])
-% if S ~= 0
-%     set(gca, 'ylim', [ -0.5*abs(S) 0.5*abs(S) ])
-% else
-%     set(gca, 'ylim', [ -0.5 0.5 ])
-% end
+
+pos = get(gca, 'Position');
+pos(4) = 0.70;
+set(gca, 'Position', pos)
 
 set(gca, 'xlim', [ 0 N ])
+
 yMax = ceil(max(max(offset)/(2*pi*wavelengthFactor)));
 yMin = floor(min(min(offset)/(2*pi*wavelengthFactor)));
-
 set(gca, 'ylim', [ yMin yMax ])
 
 yM = get(gca, 'ylim');
@@ -66,23 +62,32 @@ set(handle, 'fontsize', 14)
 
 title(theTitle)
 
-if isempty(movieFileName)
-    
-    startAnimation([], false)
-    
-else
+if saveMovie
     
     startAnimation([], true)
     
     frame = 1;
+    
+    pathValues{1} = 'Movies';
+    moviePathName = makePath(pathFormats, pathValues, []);
 
-    gifFileName = sprintf('../Movies/%s.gif', movieFileName);
+    if ~exist(moviePathName, 'dir')
+    
+        mkdir(moviePathName);
+    
+    end
+
+    gifFileName = sprintf('%s/%s.gif', moviePathName, geometry);
     addFrameToGIF(frame, fH, gifFileName)
     
-    mp4FileName = sprintf('../Movies/%s.mp4', movieFileName);
+    mp4FileName = sprintf('%s/%s.mp4',moviePathName, geometry);
     mp4Object = VideoWriter(mp4FileName, 'MPEG-4');
     open(mp4Object);
     writeVideo(mp4Object, getframe(fH));
+    
+else
+    
+    startAnimation([], false)
     
 end
 
@@ -98,7 +103,7 @@ for i = 2:size(stretch, 2)
 
     set(handle, 'string', sprintf('time = %.1f ps', t0*tau(i)*1e12))
 
-    if ~isempty(movieFileName)
+    if saveMovie
         
         drawnow;
         if ishandle(fH)
@@ -117,9 +122,10 @@ for i = 2:size(stretch, 2)
     
 end
 
-if ~isempty(movieFileName)
+if saveMovie
     
     close(mp4Object)
+    close(fH)
     
 end
 
