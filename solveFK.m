@@ -11,7 +11,6 @@ LL(end, 1) = 1;
 LR =diag(ones(1,N));
 pattern = [ [ UL, UR ] ; [ LL, LR ] ];
 
-% options = odeset('RelTol', 1e-8, 'JPattern', pattern);
 options = odeset('JPattern', pattern);
 
 t = linspace(0, tf, nTime+1);

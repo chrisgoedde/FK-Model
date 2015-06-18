@@ -51,7 +51,7 @@ L = N0*l; % length of nanotube
 % the last mass in the ring geometry.
 
 if strcmp(geometry, 'chain') || strcmp(geometry, 'flat') || ...
-        strcmp(geometry(1), 's')
+        strcmp(geometry(1), 's') || strcmp(geometry(1), 'e') 
 
     g = mAvg*(c/aWater)^2*[ 0 ; ones(N-1, 1) ];
 
@@ -136,8 +136,23 @@ elseif strcmp(geometry(1), 's')
     
     stretch = str2double(geometry(2:end));
     [ phi0, rho0 ] = solitonIC(N, 0, stretch, wavelengthFactor, epsilon0, beta, gamma, 0);
-%     phi0 = 2*pi * (1+stretch/N) * (0:(N-1))';
-%     rho0 = zeros(N, 1);
+
+elseif strcmp(geometry(1), 'e')
+    
+    stretch = str2double(geometry(2:end));
+    [ phi0, rho0 ] = solitonIC(N, 0, stretch, wavelengthFactor, epsilon0, beta, gamma, 0);
+    
+    fprintf('Equilibrating initial condition ...\n')
+    
+    [ ~, phi, rho, ~, ~ ] = solveFK((0.05*1e-9)/t0, round(0.05*1e-9/dt), ...
+        trimOutput(round(0.05*1e-9/dt)), phi0, ...
+        rho0, delta, gamma, alpha, epsilon, 0*epsilonPush, 0*tau0Push, 0*taufPush, ...
+        0*epsilonPull, 0*tau0Pull, 0*taufPull, t0*3e11, etaPrime, Omega, @ode45);
+    
+    phi0 = phi(:, end);
+    rho0 = rho(:, end);
+
+    fprintf('Completed initial condition.\n')
     
 else
     
@@ -159,7 +174,7 @@ end
 
 % Annoyingly, while the initial conditions must be column vectors, ode45
 % makes the output variables row vectors (with time being the column
-% vector), so we'll transpose this for consistency. As a result, the
+% vector), so we'll transpose the output for consistency. As a result, the
 % molecule's index is the first element of phi, rho, stretch, and energy,
 % while the time index is the second element.
 
