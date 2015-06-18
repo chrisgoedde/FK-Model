@@ -51,7 +51,6 @@ for j = 1:length(springList)
             PE(i, j) = NaN;
             
         end
-        fprintf('Length of %s with %.2f = %.2f\n', geometryList{i}, gammaList(i, j), chainLength(i, j));
             
     end
     
