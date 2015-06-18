@@ -145,6 +145,22 @@ if ~strcmp(geometry, 'ring')
     
 end
 
+if nPush == 0
+    
+    fPush = 0;
+    t0Push = 0;
+    tfPush = 0;
+    
+end
+
+if nPull == 0
+    
+    fPull = 0;
+    t0Pull = 0;
+    tfPull = 0;
+    
+end
+
 % Save the last set of values to the default file.
 
 save(FKDefaults, 'N0', 'S', 'theType', 'f0', 'bathTemp', 'tf', ...
@@ -167,8 +183,8 @@ if nPush + nPull == 0
 else
    
     pathFormats = { '%s', 'type = %d', 'N0 = %d', 'eta = %.2e Hz', ...
-        'T = %d K', 'S = %d', 'push = (%d, %.2e pN, %.2f ns, %.2f ns)', ...
-        'pull = (%d, %.2e pN, %.2f ns, %.2f ns)', 'spring = %.2e', 'spacing = %.2e', ...
+        'T = %d K', 'S = %d', 'push = (%d, %.2e pN, %.3f ns, %.3f ns)', ...
+        'pull = (%d, %.2e pN, %.3f ns, %.3f ns)', 'spring = %.2e', 'spacing = %.2e', ...
         'tf = %.2e ns', 'method = %s' };
     
     pathValues = { folderName, theType, N0, eta, bathTemp, S, ...

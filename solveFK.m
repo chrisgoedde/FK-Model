@@ -1,4 +1,4 @@
-function [ t, phif, rhof, phiSum, rhoSum ] = solveFK(tf, nTime, nOut, phi0, rho0, delta, gamma, alpha, epsilon, beta, betaPrime, Omega, method)
+function [ t, phif, rhof, phiSum, rhoSum ] = solveFK(tf, nTime, nOut, phi0, rho0, delta, gamma, alpha, epsilon, epsilonPush, t0Push, tfPush, epsilonPull, t0Pull, tfPull, beta, betaPrime, Omega, method)
 
 y0 = [ phi0; rho0 ];
 N = length(phi0);
@@ -72,7 +72,7 @@ rhof = y(:, N+1:2*N)';
 phiSum = ySum(:, 1:N)';
 rhoSum = ySum(:, N+1:2*N)';
 
-    function dy = FK(~, y0)
+    function dy = FK(tau, y0)
         
         phi = y0(1:N);
         rho = y0(N+1:2*N);
@@ -86,11 +86,17 @@ rhoSum = ySum(:, N+1:2*N)';
         b = circshift(gamma, -1).*circshift(stretch, -1);
         c = -beta*(rho+sign(rho).*drho) + epsilon - sin(phi);
         
-%         if t <= 500
-%             c = -beta*rho + epsilon - sin(phi);
-%         else
-%             c = -beta*rho - sin(phi);
-%         end
+        if tau >= t0Push && tau <= tfPush
+            
+            c = c + epsilonPush;
+            
+        end
+        
+        if tau >= t0Pull && tau <= tfPull
+            
+            c = c + epsilonPull;
+            
+        end
         
         drho = a + b + c;
         

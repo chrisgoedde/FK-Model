@@ -1,4 +1,4 @@
-function animateFK(varargin)
+function animateFK(movieFileName, varargin)
 
 alpha = [];
 gamma = [];
@@ -23,7 +23,7 @@ load(sprintf('%s/%sConstants.mat', readPathName, geometry));
 
 [ stretch, offset, ~, ~, ~, ~, ~, ~, ~ ] = processChain(phi, rho, wavelengthFactor, alpha, delta, gamma, beta, epsilon);
 
-theTitle = makePlotTitle(alpha, gamma, runNumber);
+theTitle = makeAnimationTitle(alpha, gamma, runNumber);
 
 moleculeIndex = (1:N)';
 
@@ -66,7 +66,19 @@ set(handle, 'fontsize', 14)
 
 title(theTitle)
 
-startAnimation([], false)
+if isempty(movieFileName)
+    
+    startAnimation([], false)
+    
+else
+    
+    startAnimation([], true)
+    movieFileName = sprintf('../Movies/%s', movieFileName);
+    
+    addFrame(1, fH, movieFileName)
+    frame = 1;
+
+end
 
 for i = 2:size(stretch, 2)
     
@@ -76,13 +88,23 @@ for i = 2:size(stretch, 2)
         
     end
    
-%     set(p, 'ydata', stretch(:, i));
-%     set(p, 'ydata', (offset(:, i)-mean(offset(:, i)))/(4*pi));
     set(p, 'ydata', offset(:, i)/(2*pi*wavelengthFactor));
-%     set(p, 'ydata', phi(:, i)/(4*pi));
 
     set(handle, 'string', sprintf('time = %.1f ps', t0*tau(i)*1e12))
-    pause(0.05);
+
+    if ~isempty(movieFileName)
+        
+        drawnow;
+        if ishandle(fH)
+            frame = frame + 1;
+            addFrame(frame, fH, movieFileName)
+        end
+        
+    else
+        
+        pause(0.05);
+        
+    end
     
 end
 
