@@ -50,8 +50,7 @@ L = N0*l; % length of nanotube
 % spring constant that lies to the left of the first mass, connecting it to
 % the last mass in the ring geometry.
 
-if strcmp(geometry, 'chain') || strcmp(geometry, 'flat') || ...
-        strcmp(geometry(1), 's') || strcmp(geometry(1), 'e') 
+if strcmp(geometry, 'chain') || strcmp(geometry(1), 's') || strcmp(geometry(1), 'e') 
 
     g = mAvg*(c/aWater)^2*[ 0 ; ones(N-1, 1) ];
 
@@ -125,11 +124,6 @@ end
 if strcmp(geometry, 'chain')
     
     phi0 = spacingFactor * (2*pi/lambda) * a .* (0:(N-1))';
-    rho0 = zeros(N, 1);
-    
-elseif strcmp(geometry, 'flat')
-    
-    phi0 = 2*pi * (0:(N-1))';
     rho0 = zeros(N, 1);
     
 elseif strcmp(geometry(1), 's')

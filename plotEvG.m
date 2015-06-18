@@ -6,7 +6,7 @@ beta = [];
 
 [ pathFormats, pathValues, runNumber ] = parseArguments(varargin{:});
 
-geometryList = { 'flat', 's1', 's2', 's3', 's4', 's5', 's6' };
+geometryList = { 's0', 's1', 's2', 's3', 's4', 's5', 's6' };
 
 topPathName = makePath(pathFormats, pathValues, 'f =');
 

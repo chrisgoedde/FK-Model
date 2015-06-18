@@ -10,12 +10,7 @@ if strcmp(geometry, 'chain')
     titleLine = { sprintf('Free-end chain, N0 = %d, spacing = a, Run %d', ...
         N0, runNumber) };
     
-elseif strcmp(geometry, 'flat')
-    
-    titleLine = { sprintf('Free-end chain, N0 = %d, spacing = lambda, Run %d', ...
-        N0, runNumber) };
-    
-elseif strcmp(geometry(1), 's')
+elseif strcmp(geometry(1), 's') || strcmp(geometry(1), 'e')
     
     titleLine = { sprintf('Free-end chain, N0 = %d, solitions = %d, Run %d', ...
         N0, str2double(geometry(2:end)), runNumber) };

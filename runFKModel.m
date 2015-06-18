@@ -1,5 +1,5 @@
 spacing = [ 0.445 0.45 0.455 0.465 0.47 0.475 0.48 ];
-geometry = { 'flat' 's1' 's2' 's3' 's4' 's5' 's6' };
+geometry = { 's0' 's1' 's2' 's3' 's4' 's5' 's6' };
 
 for i = 1:length(spacing)
     
