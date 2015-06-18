@@ -18,6 +18,14 @@ function [ pathFormats, pathValues, runNumber ] = parseArguments(varargin)
 % 'Save Folder' -> sets folderName
 % 'Run' -> sets runNumber
 % 'Geometry' -> set geometry to 'ring' or 'chain'
+% 'Push' -> set nPush
+% 'Push Force' -> set fPush
+% 'Push Start' -> set t0Push
+% 'Push End' -> set tfPush
+% 'Pull' -> set nPull
+% 'Pull Force' -> set fPull
+% 'Pull Start' -> set t0Pull
+% 'Pull End' -> set tfPull
 % '2D Spring' -> set transverse spring constant for 2D FK model
 
 runNumber = 1; % default run number for reading in data
@@ -91,6 +99,38 @@ for i = 1:length(varargin)/2
             
             Gamma = theValue;
             
+        case 'Push'
+            
+            nPush = theValue;
+            
+        case 'Push Force'
+            
+            fPush = theValue;
+            
+        case 'Push Start'
+            
+            t0Push = theValue;
+            
+        case 'Push End'
+            
+            tfPush = theValue;
+            
+        case 'Pull'
+            
+            nPull = theValue;
+            
+        case 'Pull Force'
+            
+            fPull = theValue;
+            
+        case 'Pull Start'
+            
+            t0Pull = theValue;
+            
+        case 'Pull End'
+            
+            tfPull = theValue;
+            
         otherwise
             
             fprintf('No valid parameter ''%s''.\n', theString);
@@ -109,16 +149,33 @@ end
 
 save(FKDefaults, 'N0', 'S', 'theType', 'f0', 'bathTemp', 'tf', ...
     'eta', 'springFactor', 'spacingFactor', ...
-    'methodName', 'geometry', 'folderName');
+    'methodName', 'geometry', 'folderName', ...
+    'nPush', 'fPush', 't0Push', 'tfPush', ...
+    'nPull', 'fPull', 't0Pull', 'tfPull');
 
-% Make a cell array for the path for reading/writing the data. Order is:
-% folderName, type, N0, eta, bathTemp, S, f0, tf, methodName
+% Make a cell array for the path for reading/writing the data.
 
-pathFormats = { '%s', 'type = %d', 'N0 = %d', 'eta = %.2e Hz', ...
-    'T = %d K', 'S = %d', 'f = %.2e pN', 'spring = %.2e', 'spacing = %.2e', ...
-    'tf = %.2e ns', 'method = %s' };
-pathValues = { folderName, theType, N0, eta, bathTemp, S, f0, springFactor, ...
-    spacingFactor, tf, methodName };
+if nPush + nPull == 0
+    
+    pathFormats = { '%s', 'type = %d', 'N0 = %d', 'eta = %.2e Hz', ...
+        'T = %d K', 'S = %d', 'f = %.2e pN', 'spring = %.2e', 'spacing = %.2e', ...
+        'tf = %.2e ns', 'method = %s' };
+    
+    pathValues = { folderName, theType, N0, eta, bathTemp, S, f0, springFactor, ...
+        spacingFactor, tf, methodName };
+    
+else
+   
+    pathFormats = { '%s', 'type = %d', 'N0 = %d', 'eta = %.2e Hz', ...
+        'T = %d K', 'S = %d', 'push = (%d, %.2e pN, %.2f ns, %.2f ns)', ...
+        'pull = (%d, %.2e pN, %.2f ns, %.2f ns)', 'spring = %.2e', 'spacing = %.2e', ...
+        'tf = %.2e ns', 'method = %s' };
+    
+    pathValues = { folderName, theType, N0, eta, bathTemp, S, ...
+        [ nPush, fPush, t0Push, tfPush ], [ nPull, fPull, t0Pull, tfPull ], springFactor, ...
+        spacingFactor, tf, methodName };
+
+end
 
 if strcmp(methodName, '2D')
     

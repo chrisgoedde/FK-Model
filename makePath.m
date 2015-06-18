@@ -4,7 +4,6 @@ thePath = '..';
 
 num = length(pathFormats);
 
-
 if ~isempty(theString)
     
     for i = 1:num

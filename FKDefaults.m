@@ -19,10 +19,20 @@ if ~exist(name, 'file')
     methodName = 'ode45'; % default method of integration
     folderName = 'Results'; % default save folder for data
     geometry = 'ring'; % default geometry (alternate: 'chain')
+    nPush = 0; % default number of molecules on left to be pushed
+    fPush = 0; % default pushing force, in pN
+    t0Push = 0; % default start time for pushing, in ns
+    tfPush = 0; % default end time for pushing, in ns
     
+    nPull = 0; % default number of molecules on right to be pulled
+    fPull = 0; % default pulling force, in pN
+    t0Pull = 0; % default start time for pulling, in ns
+    tfPull = 0; % default end time for pulling, in ns
+
     save(name, 'N0', 'theType', 'S', 'f0', 'bathTemp', 'tf', 'eta', ...
         'springFactor', 'spacingFactor', 'methodName', 'folderName', ...
-        'geometry')
+        'geometry', 'nPush', 'fPush', 't0Push', 'tfPush', ...
+        'nPull', 'fPull', 't0Pull', 'tfPull')
 
 end
 
