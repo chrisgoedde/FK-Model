@@ -14,26 +14,13 @@ function [ pathFormats, pathValues, runNumber ] = parseArguments(varargin)
 % 'Damping' -> sets eta
 % 'Spring' -> sets springFactor
 % 'Spacing' -> sets spacingFactor
-% 'Nonlinear Damping' -> sets etaPrime --- no longer returned
 % 'Integration Method' -> sets methodName
 % 'Save Folder' -> sets folderName
 % 'Run' -> sets runNumber
 % 'Geometry' -> set geometry to 'ring' or 'chain'
 % '2D Spring' -> set transverse spring constant for 2D FK model
 
-% N0 = 100; % default number of carbon rings
-% type = 4; % default to (4, 4) nanotube
-% S = -1; % default to one fewer water molecule
-% f0 = 1e-2; % default external forcing, in pN
-% bathTemp = 20; % default temperature, in K
-% tf = 10; % default integration time, in ns
-% eta = 3e9; % default damping, in Hz
-% springFactor = 1; % modification of water spring constant
-% spacingFactor = 1; % modificaiton of water spacing constant
-% methodName = 'ode45'; % default method of integration
-% folderName = 'Results'; % default save folder for data
 runNumber = 1; % default run number for reading in data
-% geometry = 'ring'; % default geometry (alternate: 'chain')
 Gamma = 1; % default 2D quadratic spring constant
 
 load(FKDefaults)
@@ -79,10 +66,6 @@ for i = 1:length(varargin)/2
             
             spacingFactor = theValue;
 
-%         case 'Nonlinear Damping'
-%             
-%             etaPrime = theValue;
-%             
         case 'Duration'
             
             tf = theValue;
