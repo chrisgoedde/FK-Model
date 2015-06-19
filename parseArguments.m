@@ -109,11 +109,11 @@ for i = 1:length(varargin)/2
             
         case 'Push Start'
             
-            t0Push = theValue;
+            t0Push = theValue/1000;
             
         case 'Push End'
             
-            tfPush = theValue;
+            tfPush = theValue/1000;
             
         case 'Pull'
             
@@ -125,11 +125,11 @@ for i = 1:length(varargin)/2
             
         case 'Pull Start'
             
-            t0Pull = theValue;
+            t0Pull = theValue/1000;
             
         case 'Pull End'
             
-            tfPull = theValue;
+            tfPull = theValue/1000;
             
         otherwise
             

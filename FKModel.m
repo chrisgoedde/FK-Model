@@ -12,6 +12,20 @@ geometry = [];
 
 load(FKDefaults)
 
+if t0Pull > tfPull
+    
+    disp('Pull end time must be later than pull start time.')
+    return
+    
+end
+
+if t0Push > tfPush
+    
+    disp('Push end time must be later than push start time.')
+    return
+    
+end
+
 % etaPrime was the nonlinear damping parameter which is no longer used.
 etaPrime = 0;
 

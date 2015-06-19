@@ -21,13 +21,13 @@ if ~exist(name, 'file')
     geometry = 'ring'; % default geometry (alternate: 'chain')
     nPush = 0; % default number of molecules on left to be pushed
     fPush = 0; % default pushing force, in pN
-    t0Push = 0; % default start time for pushing, in ns
-    tfPush = 0; % default end time for pushing, in ns
+    t0Push = 0; % default start time for pushing, in ps
+    tfPush = 0; % default end time for pushing, in ps
     
     nPull = 0; % default number of molecules on right to be pulled
     fPull = 0; % default pulling force, in pN
-    t0Pull = 0; % default start time for pulling, in ns
-    tfPull = 0; % default end time for pulling, in ns
+    t0Pull = 0; % default start time for pulling, in ps
+    tfPull = 0; % default end time for pulling, in ps
 
     save(name, 'N0', 'theType', 'S', 'f0', 'bathTemp', 'tf', 'eta', ...
         'springFactor', 'spacingFactor', 'methodName', 'folderName', ...
