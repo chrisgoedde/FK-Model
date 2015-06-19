@@ -23,7 +23,7 @@ load(sprintf('%s/%sConstants.mat', readPathName, geometry));
 
 [ stretch, offset, ~, ~, ~, ~, ~, ~, ~ ] = processChain(phi, rho, wavelengthFactor, alpha, delta, gamma, beta, epsilon);
 
-theTitle = makeAnimationTitle(alpha, beta, gamma, runNumber);
+theTitle = makeAnimationTitle(alpha, beta, gamma, epsilon0Pull, epsilon0Push, runNumber);
 
 moleculeIndex = (1:N)';
 
