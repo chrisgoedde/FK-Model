@@ -2,7 +2,7 @@ function plotEnergy(varargin)
 
 [ pathFormats, pathValues, runNumber ] = parseArguments(varargin{:});
 
-load(FKDefault, 'geometry')
+load(FKDefaults, 'geometry')
 
 readPathName = makePath(pathFormats, pathValues, []);
 
@@ -12,7 +12,7 @@ beta = [];
 
 fontSize = 14;
 
-if ~exists(sprintf('%s/%sConstants.mat', readPathName, geometry), 'file')
+if ~exist(sprintf('%s/%sConstants.mat', readPathName, geometry), 'file')
     
     fprintf('No appropriate run at %s.\n', readPathName);
     return
