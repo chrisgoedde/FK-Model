@@ -23,7 +23,7 @@ load(sprintf('%s/%sConstants.mat', readPathName, geometry));
 
 theTitle = makePlotTitle(alpha, gamma, runNumber);
 
-[ ~, offset, ~, ~, ~, ~, ~, ~, ~, ~ ] = processChain(phi, rho, wavelengthFactor, alpha, delta, gamma, beta, epsilon);
+[ ~, offset, ~, ~, ~, ~, ~, ~, ~, ~ ] = processChain(tau, phi, rho, wavelengthFactor, alpha, delta, gamma, beta, epsilon,  epsilonPush, tau0Push, taufPush, epsilonPull, tau0Pull, taufPull);
 
 moleculeIndex = (1:N)';
 
