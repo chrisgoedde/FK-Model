@@ -35,7 +35,17 @@ N = N0+S;
 dt = 1e-4; % Step size for the thermal noise, in ns.
 nTime = round(tf/dt);
 
-nOut = trimOutput(nTime);
+if nTime < 1000
+    
+    nTime = 1000;
+    dt = tf/nTime;
+    nOut = nTime;
+    
+else
+
+    nOut = trimOutput(nTime);
+
+end
 
 dt = dt*1e-9; % Convert step size to ns.
 
