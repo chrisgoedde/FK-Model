@@ -40,7 +40,7 @@ for j = 1:length(spacingList)
         
         [ ~, phi, rho ] = loadDynamics(newPathName, geometryList{i}, runNumber);
         
-        [ ~, offset, ~, tempPE, ~, ~, ~, ~, ~ ] = processChain(phi, rho, wavelengthFactor, alpha, delta, gamma, beta, epsilon);
+        [ ~, offset, ~, tempPE, ~, ~, ~, ~, ~, ~ ] = processChain(phi, rho, wavelengthFactor, alpha, delta, gamma, beta, epsilon);
 
         ratioList(i, j) = alpha(end)/(2*pi);
         PE(i, j) = tempPE(end)/N;

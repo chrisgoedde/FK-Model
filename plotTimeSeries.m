@@ -24,7 +24,7 @@ load(sprintf('%s/%sConstants.mat', readPathName, geometry));
 [ tau, phi, rho, ~, rhoAvg ] = loadDynamics(readPathName, geometry, runNumber);
 % rhoAvg = rhoAvg';
 
-[ ~, ~, KE, PE, power, springForce, dampingForce, drivingForce, potentialForce ] = processChain(phi, rho, wavelengthFactor, alpha, delta, gamma, beta, epsilon);
+[ ~, ~, KE, PE, power, springForceLeft, springForceRight, dampingForce, drivingForce, potentialForce ] = processChain(phi, rho, wavelengthFactor, alpha, delta, gamma, beta, epsilon);
 
 % pAvg = p0*mean(rho);
 % vAvg = pAvg/mAvg;
@@ -47,7 +47,7 @@ subplot(2, 2, 1)
 
 plot(t0*tau*1e9, p0*sum(potentialForce)*1e12/t0, 'g', 'linewidth', 2)
 grid on, box on, hold on
-plot(t0*tau*1e9, p0*sum(springForce)*1e12/t0, 'b', 'linewidth', 2) 
+plot(t0*tau*1e9, p0*sum(springForceLeft + springForceRight)*1e12/t0, 'b', 'linewidth', 2) 
 plot(t0*tau*1e9, p0*sum(dampingForce)*1e12/t0, 'r', 'linewidth', 2)
 plot(t0*tau*1e9, p0*sum(drivingForce)*1e12/t0, 'k', 'linewidth', 2)
 
@@ -108,7 +108,7 @@ title(theTitle)
 subplot(2, 2, 4)
 
 % [ phiTemp, rhoTemp ] = ringIC(N, S, epsilon0, beta, gamma, 0);
-% [ ~, ~, ~, ~, PE0, ~, ~, ~, ~, ~ ] = processChain(phiTemp, rhoTemp, alpha, delta, gamma, beta, epsilon);
+% [ ~, ~, ~, ~, PE0, ~, ~, ~, ~, ~, ~ ] = processChain(phiTemp, rhoTemp, alpha, delta, gamma, beta, epsilon);
 PE0 = 0;
 
 % plot(t0*tau*1e9, (V0/2)*(PE-PE0)/(N*kB), 'r', 'linewidth', 2), grid on, box on, hold on

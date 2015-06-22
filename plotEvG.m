@@ -40,7 +40,7 @@ for j = 1:length(springList)
         
         [ ~, phi, rho ] = loadDynamics(newPathName, geometryList{i}, runNumber);
         
-        [ ~, offset, ~, tempPE, ~, ~, ~, ~, ~ ] = processChain(phi, rho, wavelengthFactor, alpha, delta, gamma, beta, epsilon);
+        [ ~, offset, ~, tempPE, ~, ~, ~, ~, ~, ~ ] = processChain(phi, rho, wavelengthFactor, alpha, delta, gamma, beta, epsilon);
 
         gammaList(i, j) = gamma(end);
         PE(i, j) = tempPE(end)/N;
