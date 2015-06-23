@@ -162,10 +162,12 @@ elseif strcmp(geometry(1), 'e')
     
     fprintf('Equilibrating initial condition ...\n')
     
-    [ ~, phi, rho, ~, ~ ] = solveFK((0.05*1e-9)/t0, round(0.05*1e-9/dt), ...
-        trimOutput(round(0.05*1e-9/dt)), phi0, ...
-        rho0, delta, gamma, alpha, epsilon, 0*epsilonPush, 0*tau0Push, 0*taufPush, ...
-        0*epsilonPull, 0*tau0Pull, 0*taufPull, t0*3e11, etaPrime, Omega, @ode45);
+    initForce(0*epsilon, 0*epsilonPush, tau0Push, taufPush, ...
+        0*epsilonPull, tau0Pull, taufPull);
+    
+    [ ~, phi, rho, ~, ~ ] = solveFK((0.05*1e-9)/t0, round(0.05/1e-4), ...
+        trimOutput(round(0.05/1e-4)), phi0, ...
+        rho0, delta, gamma, alpha, t0*3e11, etaPrime, Omega, @ode45);
     
     phi0 = phi(:, end);
     rho0 = rho(:, end);
@@ -226,9 +228,11 @@ else
         
     end
     
+    initForce(epsilon, epsilonPush, tau0Push, taufPush, ...
+        epsilonPull, tau0Pull, taufPull);
+    
     [ tau, phi, rho, phiAvg, rhoAvg ] = solveFK(tauf, nTime, nOut, phi0, ...
-        rho0, delta, gamma, alpha, epsilon, epsilonPush, tau0Push, taufPush, ...
-        epsilonPull, tau0Pull, taufPull, beta, etaPrime, Omega, method);
+        rho0, delta, gamma, alpha, beta, etaPrime, Omega, method);
     
 end
 

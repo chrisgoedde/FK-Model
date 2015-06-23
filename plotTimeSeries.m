@@ -24,7 +24,7 @@ load(sprintf('%s/%sConstants.mat', readPathName, geometry));
 [ tau, phi, rho, ~, rhoAvg ] = loadDynamics(readPathName, geometry, runNumber);
 % rhoAvg = rhoAvg';
 
-[ ~, ~, KE, PE, power, springForceLeft, springForceRight, dampingForce, drivingForce, potentialForce ] = processChain(tau, phi, rho, wavelengthFactor, alpha, delta, gamma, beta, epsilon,  epsilonPush, tau0Push, taufPush, epsilonPull, tau0Pull, taufPull);
+[ ~, ~, KE, PE, power, springForceLeft, springForceRight, dampingForce, drivingForce, potentialForce ] = processChain(tau, phi, rho, wavelengthFactor, alpha, delta, gamma, beta);
 
 % pAvg = p0*mean(rho);
 % vAvg = pAvg/mAvg;
@@ -120,7 +120,7 @@ title(theTitle)
 subplot(2, 2, 4)
 
 % [ phiTemp, rhoTemp ] = ringIC(N, S, epsilon0, beta, gamma, 0);
-% [ ~, ~, ~, ~, PE0, ~, ~, ~, ~, ~, ~ ] = processChain(tau, phiTemp, rhoTemp, wavelengthFactor, alpha, delta, gamma, beta, epsilon,  epsilonPush, tau0Push, taufPush, epsilonPull, tau0Pull, taufPull);
+% [ ~, ~, ~, ~, PE0, ~, ~, ~, ~, ~, ~ ] = processChain(tau, phiTemp, rhoTemp, wavelengthFactor, alpha, delta, gamma, beta);
 PE0 = 0;
 
 % plot(time, (V0/2)*(PE-PE0)/(N*kB), 'r', 'linewidth', 2), grid on, box on, hold on

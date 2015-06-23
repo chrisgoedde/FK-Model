@@ -24,7 +24,7 @@ load(sprintf('%s/%sConstants.mat', readPathName, geometry));
 [ tau, phi, rho, ~, ~ ] = loadDynamics(readPathName, geometry, runNumber);
 % rhoAvg = rhoAvg';
 
-[ ~, ~, KE, PE, power, ~, ~, ~, ~, ~ ] = processChain(tau, phi, rho, wavelengthFactor, alpha, delta, gamma, beta, epsilon,  epsilonPush, tau0Push, taufPush, epsilonPull, tau0Pull, taufPull);
+[ ~, ~, KE, PE, power, ~, ~, ~, ~, ~ ] = processChain(tau, phi, rho, wavelengthFactor, alpha, delta, gamma, beta);
 
 theTitle = makePlotTitle(alpha, gamma, runNumber);
 
