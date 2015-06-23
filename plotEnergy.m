@@ -28,17 +28,29 @@ load(sprintf('%s/%sConstants.mat', readPathName, geometry));
 
 theTitle = makePlotTitle(alpha, gamma, runNumber);
 
+time = t0*tau*1e9;
+if max(time) <= 0.01
+    
+    time = time*1e3;
+    timeUnit = 'ps';
+    
+else
+    
+    timeUnit = 'ns';
+    
+end
+
 figure;
 
-plot(t0*tau*1e9, (V0/2)*PE/(N*kB), 'r', 'linewidth', 2), grid on, box on, hold on
-plot(t0*tau*1e9, (V0/2)*KE/(N*kB), 'g', 'linewidth', 2)
+plot(time, (V0/2)*PE/(N*kB), 'r', 'linewidth', 2), grid on, box on, hold on
+plot(time, (V0/2)*KE/(N*kB), 'g', 'linewidth', 2)
 
-coeff = polyfit(t0*tau*1e9, 2*(V0/2)*KE/(N*kB), 1);
+coeff = polyfit(time, 2*(V0/2)*KE/(N*kB), 1);
 power = mean(sum(power))*(V0/(2*t0))*1e-9*(2/(N*kB));
-fprintf('Power input per molecule (predicted, actual) = (%.2f %.2f)  K/ns.\n', power, coeff(1));
+fprintf('Power input per molecule (predicted, actual) = (%.2f %.2f)  K/%s.\n', power, coeff(1), timeUnit);
 
 set(gca, 'fontsize', fontSize)
-xlabel('time (ns)')
+xlabel(sprintf('time (%s)', timeUnit))
 ylabel('Energy per molecule (Kelvin)')
 
 legend('Potential', 'Kinetic', 'location', 'best')

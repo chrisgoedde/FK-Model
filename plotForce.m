@@ -34,15 +34,27 @@ figure;
 %     + potentialForce(partNum, :) ...
 %     + drivingForce(partNum, :) + dampingForce(partNum, :);
 
-plot(t0*tau*1e9, springForceLeft(partNum, :), 'linewidth', 2), grid on, box on, hold on
-plot(t0*tau*1e9, springForceRight(partNum, :), 'linewidth', 2), grid on, box on, hold on
-plot(t0*tau*1e9, potentialForce(partNum, :), 'linewidth', 2)
-plot(t0*tau*1e9, drivingForce(partNum, :), 'linewidth', 2)
-plot(t0*tau*1e9, dampingForce(partNum, :), 'linewidth', 2)
-% plot(t0*tau*1e9, totalForce, 'linewidth', 2)
+time = t0*tau*1e9;
+if max(time) <= 0.01
+    
+    time = time*1e3;
+    timeUnit = 'ps';
+    
+else
+    
+    timeUnit = 'ns';
+    
+end
+
+plot(time, springForceLeft(partNum, :), 'linewidth', 2), grid on, box on, hold on
+plot(time, springForceRight(partNum, :), 'linewidth', 2), grid on, box on, hold on
+plot(time, potentialForce(partNum, :), 'linewidth', 2)
+plot(time, drivingForce(partNum, :), 'linewidth', 2)
+plot(time, dampingForce(partNum, :), 'linewidth', 2)
+% plot(time, totalForce, 'linewidth', 2)
 
 set(gca, 'fontsize', fontSize)
-xlabel('time (ns)')
+xlabel(sprintf('time (%s)', timeUnit))
 ylabel(sprintf('Dimensionless force on molecule %d', partNum))
 
 % legend('Left Spring', 'Right Spring', 'Substrate', 'External', 'Damping', 'Total', 'location', 'best')
