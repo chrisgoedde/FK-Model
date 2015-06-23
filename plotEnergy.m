@@ -26,7 +26,7 @@ load(sprintf('%s/%sConstants.mat', readPathName, geometry));
 
 [ ~, ~, KE, PE, power, ~, ~, ~, ~, ~ ] = processChain(tau, phi, rho, wavelengthFactor, alpha, delta, gamma, beta);
 
-theTitle = makePlotTitle(alpha, gamma, runNumber);
+theTitle = makeTitle(alpha, beta, gamma, epsilon0Pull, epsilon0Push, runNumber);
 
 time = t0*tau*1e9;
 if max(time) <= 0.01

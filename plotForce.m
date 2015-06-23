@@ -26,7 +26,7 @@ load(sprintf('%s/%sConstants.mat', readPathName, geometry));
 
 [ ~, ~, ~, ~, ~, springForceLeft, springForceRight, dampingForce, drivingForce, potentialForce ] = processChain(tau, phi, rho, wavelengthFactor, alpha, delta, gamma, beta);
 
-theTitle = makePlotTitle(alpha, gamma, runNumber);
+theTitle = makeTitle(alpha, beta, gamma, epsilon0Pull, epsilon0Push, runNumber);
 
 figure;
 

@@ -21,7 +21,7 @@ load(sprintf('%s/%sConstants.mat', readPathName, geometry));
 
 [ ~, phi, rho ] = loadDynamics(readPathName, geometry, runNumber);
 
-theTitle = makePlotTitle(alpha, gamma, runNumber);
+theTitle = makeTitle(alpha, beta, gamma, epsilon0Pull, epsilon0Push, runNumber);
 
 [ ~, offset, ~, ~, ~, ~, ~, ~, ~, ~ ] = processChain(tau, phi, rho, wavelengthFactor, alpha, delta, gamma, beta);
 

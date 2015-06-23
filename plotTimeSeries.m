@@ -34,7 +34,7 @@ vSol = c./sqrt(1+(4*p0*eta/(pi*f0*1e-12)).^2);
 % nPer = tf*1e-9/deltaT;
 % periods = linspace(0, tf, nPer);
 
-theTitle = makePlotTitle(alpha, gamma, runNumber);
+theTitle = makeTitle(alpha, beta, gamma, epsilon0Pull, epsilon0Push, runNumber);
 
 time = t0*tau*1e9;
 if max(time) <= 0.01
