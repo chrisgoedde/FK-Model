@@ -14,8 +14,8 @@ name = sprintf('FKDefaults-%s.mat', systemName);
 if ~exist(name, 'file')
     
     % If the hostname-specific defaults file doesn't exist, create it,
-    % either from a generic defaults file (should be the last set of values
-    % used) or, as a last resort, using the hardcoded values below.
+    % either from a generic defaults file or by using the hardcoded values
+    % below.
     
     if exist('FKDefaults.mat', 'file')
         

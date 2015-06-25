@@ -169,12 +169,6 @@ save(FKDefaults, 'N0', 'S', 'theType', 'f0', 'bathTemp', 'tf', ...
     'nPush', 'fPush', 't0Push', 'tfPush', ...
     'nPull', 'fPull', 't0Pull', 'tfPull');
 
-% Copy the last set of values to a generic default file. We can use this to
-% create the hostname-specific default file if it doesn't exist in the
-% function FKDefaults.
-
-copyfile(FKDefaults, 'FKDefaults.mat')
-
 % Make a cell array for the path for reading/writing the data.
 
 if strcmp(geometry, 'ring')
