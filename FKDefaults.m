@@ -1,39 +1,57 @@
-function name = FKDefaults %#ok<*NASGU> 
+function name = FKDefaults %#ok<*NASGU>
+
+% Create the name for the hostname-specific defaults file. This name will
+% be returned by the function.
 
 [ ~, systemName ] = system('hostname');
 systemName = strtok(systemName, '.');
 
 name = sprintf('FKDefaults-%s.mat', systemName);
 
+% Check to see if hostname-specific defaults file exists. If it doesn't,
+% we'll have to create it.
+
 if ~exist(name, 'file')
     
-    N0 = 100; % default number of carbon rings
-    theType = 4; % default to (4, 4) nanotube
-    S = -1; % default to one fewer water molecule
-    f0 = 1e-2; % default external forcing, in pN
-    bathTemp = 20; % default temperature, in K
-    tf = 10; % default integration time, in ns
-    eta = 3e9; % default damping, in Hz
-    springFactor = 1; % modification of water spring constant
-    spacingFactor = 1; % modificaiton of water spacing constant
-    methodName = 'ode45'; % default method of integration
-    folderName = 'Results'; % default save folder for data
-    geometry = 'ring'; % default geometry (alternate: 'chain')
-    nPush = 0; % default number of molecules on left to be pushed
-    fPush = 0; % default pushing force, in pN
-    t0Push = 0; % default start time for pushing, in ps
-    tfPush = 0; % default end time for pushing, in ps
+    % If the hostname-specific defaults file doesn't exist, create it,
+    % either from a generic defaults file (should be the last set of values
+    % used) or, as a last resort, using the hardcoded values below.
     
-    nPull = 0; % default number of molecules on right to be pulled
-    fPull = 0; % default pulling force, in pN
-    t0Pull = 0; % default start time for pulling, in ps
-    tfPull = 0; % default end time for pulling, in ps
-
-    save(name, 'N0', 'theType', 'S', 'f0', 'bathTemp', 'tf', 'eta', ...
-        'springFactor', 'spacingFactor', 'methodName', 'folderName', ...
-        'geometry', 'nPush', 'fPush', 't0Push', 'tfPush', ...
-        'nPull', 'fPull', 't0Pull', 'tfPull')
-
+    if exist('FKDefaults.mat', 'file')
+        
+        copyfile('FKDefaults.mat', name)
+        
+    else
+        
+        N0 = 100; % default number of carbon rings
+        theType = 4; % default to (4, 4) nanotube
+        S = -1; % default to one fewer water molecule
+        f0 = 1e-2; % default external forcing, in pN
+        bathTemp = 20; % default temperature, in K
+        tf = 10; % default integration time, in ns
+        eta = 3e9; % default damping, in Hz
+        springFactor = 1; % modification of water spring constant
+        spacingFactor = 1; % modificaiton of water spacing constant
+        methodName = 'ode45'; % default method of integration
+        folderName = 'Results'; % default save folder for data
+        geometry = 'ring'; % default geometry (alternate: 'chain')
+        nPush = 0; % default number of molecules on left to be pushed
+        fPush = 0; % default pushing force, in pN
+        t0Push = 0; % default start time for pushing, in ps
+        tfPush = 0; % default end time for pushing, in ps
+        
+        nPull = 0; % default number of molecules on right to be pulled
+        fPull = 0; % default pulling force, in pN
+        t0Pull = 0; % default start time for pulling, in ps
+        tfPull = 0; % default end time for pulling, in ps
+        
+        save(name, 'N0', 'theType', 'S', 'f0', 'bathTemp', 'tf', 'eta', ...
+            'springFactor', 'spacingFactor', 'methodName', 'folderName', ...
+            'geometry', 'nPush', 'fPush', 't0Push', 'tfPush', ...
+            'nPull', 'fPull', 't0Pull', 'tfPull')
+        
+    end
+    
 end
 
 end

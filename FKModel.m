@@ -2,7 +2,7 @@ function FKModel(varargin)
 % FKModel(...)
 % All the arguments are parsed in the function parseArguments
 
-tic
+tStart = tic;
 
 geometry = [];
   
@@ -198,16 +198,7 @@ end
 % molecule's index is the first element of phi, rho, stretch, and energy,
 % while the time index is the second element.
 
-if strcmp(methodName, '2D')
-    
-    Gamma = 1;
-
-    [ tau, phi, rho, phiAvg, rhoAvg ] = solve2DFK(tauf, nTime, nOut, phi0, ...
-        rho0, delta, gamma, alpha, epsilon, epsilonPush, tau0Push, taufPush, ...
-        epsilonPull, tau0Pull, taufPull, beta, etaPrime, Omega, ...
-        sqrt(mAvg*kB*bathTemp)/p0, Gamma, @ode45);
-
-else
+if ~strcmp(methodName, '2D')
     
     if strcmp(methodName, 'ode23s')
         
@@ -234,6 +225,15 @@ else
     [ tau, phi, rho, phiAvg, rhoAvg ] = solveFK(tauf, nTime, nOut, phi0, ...
         rho0, delta, gamma, alpha, beta, etaPrime, Omega, method);
     
+else
+    
+    Gamma = 1;
+    
+    [ tau, phi, rho, phiAvg, rhoAvg ] = solve2DFK(tauf, nTime, nOut, phi0, ...
+        rho0, delta, gamma, alpha, epsilon, epsilonPush, tau0Push, taufPush, ...
+        epsilonPull, tau0Pull, taufPull, beta, etaPrime, Omega, ...
+        sqrt(mAvg*kB*bathTemp)/p0, Gamma, @ode45);
+    
 end
 
 writePathName = makePath(pathFormats, pathValues, []);
@@ -244,7 +244,7 @@ clear tau rho phi rho0 phi0 ans method varargin runNumber
 
 save(sprintf('%s/%sConstants', writePathName, geometry))
 
-elapsed = toc/60;
+elapsed = toc(tStart)/60;
 
 if elapsed > 3
     fprintf('Elapsed time using %s: %d minutes.\n', methodName, round(elapsed))
