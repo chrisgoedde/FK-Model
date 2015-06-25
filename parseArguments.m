@@ -196,7 +196,7 @@ pathValues = { folderName, BC, theType, N0, S, bathTemp, eta, [], ...
     [ nPush, fPush, t0Push*1000, tfPush*1000 ], ...
     [ nPull, fPull, t0Pull*1000, tfPull*1000 ] };
     
-if tf > 1
+if tf >= 1
     
     pathFormats = [ pathFormats, 'tf = %.1f ns', 'method = %s' ];
     pathValues = [ pathValues, tf, methodName ];
