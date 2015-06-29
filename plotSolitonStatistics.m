@@ -23,33 +23,22 @@ runNumber = 1;
 
 while exist(sprintf('%s/%sDynamics-%d.mat', readPathName, geometry, runNumber), 'file')
 
-    [ tau, phi, rho ] = loadDynamics(readPathName, geometry, runNumber);
+    [ ~, phi, ~, ~, ~ ] = loadDynamics(readPathName, geometry, runNumber);
     
-    initForce(epsilon, epsilonPush, tau0Push, taufPush, ...
-        epsilonPull, tau0Pull, taufPull);
-    [ ~, offset, ~, ~, ~, ~, ~, ~, ~, ~ ] = processChain(tau, phi, rho, wavelengthFactor, alpha, delta, gamma, beta);
+    [ ~, offset ] = findChainPosition(phi, wavelengthFactor, alpha);
 
-    offset = offset(:, end);
-    offsetDiff = (offset(end) - offset(1))/(2*pi*wavelengthFactor);
-    solitonNumber(runNumber) = floor(abs(offsetDiff))*sign(offsetDiff); %#ok<AGROW>
+    [ tNumber, pNumber ] = findSolitons(offset, wavelengthFactor);
     
-    if solitonNumber(runNumber) == 0
-        
-        solitonPosition(runNumber) = round(mean(offset)/(2*pi*wavelengthFactor)); %#ok<AGROW>
-        
-    else
-        
-        solitonPosition(runNumber) = 0.5*(ceil(mean(offset)/(2*pi*wavelengthFactor)) ...
-            + floor(mean(offset)/(2*pi*wavelengthFactor))); %#ok<AGROW>
-        
-    end
+    solitonNumber(runNumber) = tNumber(end); %#ok<AGROW>
+    solitonPosition(runNumber) = pNumber(end); %#ok<AGROW>
+    
     runNumber = runNumber + 1;
     
 end
 
 runNumber = runNumber - 1;
 
-theTitle = makeTitle(alpha, beta, gamma, epsilon0Pull, epsilon0Push, runNumber);
+theTitle = makeTitle(alpha, beta, gamma, kB*bathTemp/V0, epsilon0Pull, epsilon0Push, runNumber);
 
 [ sN, sP ] = meshgrid(min(solitonNumber):max(solitonNumber), ...
     min(solitonPosition):0.5:max(solitonPosition));
@@ -77,7 +66,6 @@ ylabel('chain offset')
 title(theTitle)
 
 map = colormap(lines);
-numPoints = 0;
 
 for j = 1:size(sN, 2)
     
@@ -85,19 +73,18 @@ for j = 1:size(sN, 2)
         
         if numRuns(i, j) ~= 0
             
-            numPoints = numPoints + 1;
             mSize = 10*sqrt(numRuns(i,j)*100/runNumber);
             
-            plot(sN(i,j), sP(i,j), 's', 'markeredgecolor', map(numPoints, :), ...
-                'markerfacecolor', map(numPoints, :), ...
+            plot(sN(i,j), sP(i,j), 's', 'markeredgecolor', map(1, :), ...
+                'markerfacecolor', map(1, :), ...
                 'markersize', mSize);
             
             set(gca, 'units', 'points')
-            pos = get(gca, 'position');
+            pos = get(gca, 'outerposition');
             xLim = get(gca, 'xlim');
             set(gca, 'units', 'normalized')
             
-            text(sN(i,j)+(mSize/2)*(xLim(2) - xLim(1))/pos(3), sP(i,j), ...
+            text(sN(i,j)+((mSize/2)+5)*(xLim(2) - xLim(1))/pos(3), sP(i,j), ...
                 sprintf('%.0f%%', numRuns(i,j)*100/runNumber), 'fontsize', 14)
             
         end
