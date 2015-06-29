@@ -2,7 +2,6 @@ function plotEvA(varargin)
 
 alpha = [];
 gamma = [];
-beta = [];
 
 [ pathFormats, pathValues, runNumber ] = parseArguments(varargin{:});
 
@@ -35,12 +34,12 @@ for j = 1:length(spacingList)
     
     for i = 1:length(geometryList)
             
-        % fprintf('Loading file %s/%sConstants.mat\n', newPathName, geometryList{i})
         load(sprintf('%s/%sConstants.mat', newPathName, geometryList{i}))
         
         [ ~, phi, rho, ~, ~ ] = loadDynamics(newPathName, geometryList{i}, runNumber);
         
-        [ ~, offset, ~, tempPE, ~, ~, ~, ~, ~, ~ ] = processChain(tau, phi, rho, wavelengthFactor, alpha, delta, gamma, beta);
+        [ ~, offset ] = findChainPosition(phi, wavelengthFactor, alpha);
+        [ ~, tempPE ] = findChainEnergy(phi, rho, alpha, delta, gamma);
 
         ratioList(i, j) = alpha(end)/(2*pi);
         PE(i, j) = tempPE(end)/N;

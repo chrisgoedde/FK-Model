@@ -26,7 +26,7 @@ load(sprintf('%s/%sConstants.mat', readPathName, geometry));
 
 initForce(epsilon, epsilonPush, tau0Push, taufPush, ...
         epsilonPull, tau0Pull, taufPull);
-[ ~, ~, ~, ~, ~, springForceLeft, springForceRight, dampingForce, drivingForce, potentialForce ] = processChain(tau, phi, rho, wavelengthFactor, alpha, delta, gamma, beta);
+[ springForceLeft, springForceRight, dampingForce, drivingForce, potentialForce ] = findChainForces(tau, phi, rho, alpha, gamma, beta);
 
 theTitle = makeTitle(alpha, beta, gamma, epsilon0Pull, epsilon0Push, runNumber);
 

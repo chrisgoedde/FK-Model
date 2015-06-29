@@ -24,9 +24,9 @@ load(sprintf('%s/%sConstants.mat', readPathName, geometry));
 [ tau, phi, rho, ~, ~ ] = loadDynamics(readPathName, geometry, runNumber);
 % rhoAvg = rhoAvg';
 
-[ ~, ~, KE, PE, power, ~, ~, ~, ~, ~ ] = processChain(tau, phi, rho, wavelengthFactor, alpha, delta, gamma, beta);
+[ KE, PE ] = findChainEnergy(phi, rho, alpha, delta, gamma);
 
-theTitle = makeTitle(alpha, beta, gamma, epsilon0Pull, epsilon0Push, runNumber);
+theTitle = makeTitle(alpha, beta, gamma, kB*bathTemp/V0, epsilon0Pull, epsilon0Push, runNumber);
 
 time = t0*tau*1e9;
 if max(time) <= 0.01
@@ -44,10 +44,6 @@ figure;
 
 plot(time, (V0/2)*PE/(N*kB), 'r', 'linewidth', 2), grid on, box on, hold on
 plot(time, (V0/2)*KE/(N*kB), 'g', 'linewidth', 2)
-
-coeff = polyfit(time, 2*(V0/2)*KE/(N*kB), 1);
-power = mean(sum(power))*(V0/(2*t0))*1e-9*(2/(N*kB));
-fprintf('Power input per molecule (predicted, actual) = (%.2f %.2f)  K/%s.\n', power, coeff(1), timeUnit);
 
 set(gca, 'fontsize', fontSize)
 xlabel(sprintf('time (%s)', timeUnit))
