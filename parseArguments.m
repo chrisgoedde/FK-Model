@@ -151,11 +151,23 @@ if nPush == 0
     t0Push = 0;
     tfPush = 0;
     
+elseif fPush == 0
+    
+    nPush = 0;
+    t0Push = 0;
+    tfPush = 0;
+
 end
 
 if nPull == 0
     
     fPull = 0;
+    t0Pull = 0;
+    tfPull = 0;
+    
+elseif fPull == 0
+    
+    nPull = 0;
     t0Pull = 0;
     tfPull = 0;
     
