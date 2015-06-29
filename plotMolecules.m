@@ -19,13 +19,11 @@ end
 
 load(sprintf('%s/%sConstants.mat', readPathName, geometry));
 
-[ tau, phi, rho ] = loadDynamics(readPathName, geometry, runNumber);
+[ ~, phi, rho, ~, ~ ] = loadDynamics(readPathName, geometry, runNumber);
 
-theTitle = makeTitle(alpha, beta, gamma, epsilon0Pull, epsilon0Push, runNumber);
+theTitle = makeTitle(alpha, beta, gamma, kB*bathTemp/V0, epsilon0Pull, epsilon0Push, runNumber);
 
-initForce(epsilon, epsilonPush, tau0Push, taufPush, ...
-        epsilonPull, tau0Pull, taufPull);
-[ ~, offset, ~, ~, ~, ~, ~, ~, ~, ~ ] = processChain(tau, phi, rho, wavelengthFactor, alpha, delta, gamma, beta);
+[ ~, offset ] = findChainPosition(phi, wavelengthFactor, alpha);
 
 moleculeIndex = (1:N)';
 

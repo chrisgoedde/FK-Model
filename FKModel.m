@@ -240,7 +240,7 @@ writePathName = makePath(pathFormats, pathValues, []);
 
 saveDynamics(writePathName, geometry, runNumber, tau, phi, rho, phiAvg, rhoAvg);
 
-clear tau rho phi rho0 phi0 ans method varargin runNumber
+clear tau rho phi rhoAvg phiAvg rho0 phi0 ans method varargin runNumber
 
 save(sprintf('%s/%sConstants', writePathName, geometry))
 
