@@ -1,4 +1,4 @@
-function theTitle = makeTitle(alpha, beta, gamma, epsilon0Pull, epsilon0Push, runNumber)
+function theTitle = makeTitle(alpha, beta, gamma, theta, epsilon0Pull, epsilon0Push, runNumber)
 
 geometry = [];
 
@@ -27,7 +27,8 @@ else
     
 end
 
-titleLine  = [ titleLine [ 'T = ' num2str(bathTemp, '%.0f') ' K, \beta = ' ...
+titleLine  = [ titleLine [ 'T = ' num2str(bathTemp, '%.0f') ' K, (kT/V_0 = ' ...
+    num2str(theta, '%.2f') ') \beta = ' ...
     num2str(beta, ' %.2e')  ', a/\lambda = ' num2str(alpha(end)/(2*pi), '%.3f') ...
     ', \gamma = ' num2str(gamma(end), '%.2f') ] ];
 
