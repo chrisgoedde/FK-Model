@@ -24,11 +24,12 @@ load(sprintf('%s/%sConstants.mat', readPathName, geometry));
 [ tau, phi, rho, ~, ~ ] = loadDynamics(readPathName, geometry, runNumber);
 % rhoAvg = rhoAvg';
 
-initForce(epsilon, epsilonPush, tau0Push, taufPush, ...
+initDrivingForce(epsilon, epsilonPush, tau0Push, taufPush, ...
         epsilonPull, tau0Pull, taufPull);
-[ springForceLeft, springForceRight, dampingForce, drivingForce, potentialForce ] = findChainForces(tau, phi, rho, alpha, gamma, beta);
+initSubstrateForce(M, Lambda, Psi);
+[ springForceLeft, springForceRight, dampingForce, drivingForce, substrateForce ] = findChainForces(tau, phi, rho, alpha, gamma, beta);
 
-theTitle = makeTitle(alpha, beta, gamma, epsilon0Pull, epsilon0Push, runNumber);
+theTitle = makeTitle(alpha, beta, gamma, kB*bathTemp/V0, epsilon0Pull, epsilon0Push, runNumber);
 
 figure;
 
@@ -50,7 +51,7 @@ end
 
 plot(time, springForceLeft(partNum, :), 'linewidth', 2), grid on, box on, hold on
 plot(time, springForceRight(partNum, :), 'linewidth', 2), grid on, box on, hold on
-plot(time, potentialForce(partNum, :), 'linewidth', 2)
+plot(time, substrateForce(partNum, :), 'linewidth', 2)
 plot(time, drivingForce(partNum, :), 'linewidth', 2)
 plot(time, dampingForce(partNum, :), 'linewidth', 2)
 % plot(time, totalForce, 'linewidth', 2)

@@ -45,10 +45,14 @@ if ~exist(name, 'file')
         t0Pull = 0; % default start time for pulling, in ps
         tfPull = 0; % default end time for pulling, in ps
         
+        M = 0; % default divide in substrate
+        Lambda = 1; % default wavelength ratio in substrate
+        Psi = 1; % default potential height ratio in substrate
+        
         save(name, 'N0', 'theType', 'S', 'f0', 'bathTemp', 'tf', 'eta', ...
             'springFactor', 'spacingFactor', 'methodName', 'folderName', ...
             'geometry', 'nPush', 'fPush', 't0Push', 'tfPush', ...
-            'nPull', 'fPull', 't0Pull', 'tfPull')
+            'nPull', 'fPull', 't0Pull', 'tfPull', 'M', 'Lambda', 'Psi')
         
     end
     

@@ -25,9 +25,10 @@ load(sprintf('%s/%sConstants.mat', readPathName, geometry));
 % rhoAvg = rhoAvg';
 
 [ KE, PE ] = findChainEnergy(phi, rho, alpha, delta, gamma);
-initForce(epsilon, epsilonPush, tau0Push, taufPush, ...
+initDrivingForce(epsilon, epsilonPush, tau0Push, taufPush, ...
         epsilonPull, tau0Pull, taufPull);
-[ springForceLeft, springForceRight, dampingForce, drivingForce, potentialForce ] = findChainForces(tau, phi, rho, alpha, gamma, beta);
+initSubstrateForce(M, Lambda, Psi);
+[ springForceLeft, springForceRight, dampingForce, drivingForce, substrateForce ] = findChainForces(tau, phi, rho, alpha, gamma, beta);
 
 % pAvg = p0*mean(rho);
 % vAvg = pAvg/mAvg;
@@ -60,7 +61,7 @@ set(f, 'position', pos);
 
 subplot(2, 2, 1)
 
-plot(time, p0*sum(potentialForce)*1e12/t0, 'g', 'linewidth', 2)
+plot(time, p0*sum(substrateForce)*1e12/t0, 'g', 'linewidth', 2)
 grid on, box on, hold on
 plot(time, p0*sum(springForceLeft + springForceRight)*1e12/t0, 'b', 'linewidth', 2) 
 plot(time, p0*sum(dampingForce)*1e12/t0, 'r', 'linewidth', 2)

@@ -3,7 +3,8 @@ function theTitle = makeTitle(alpha, beta, gamma, theta, epsilon0Pull, epsilon0P
 geometry = [];
 
 load(FKDefaults, 'N0', 'bathTemp', 'S', 'geometry', ...
-    'nPull', 'fPull', 't0Pull', 'tfPull', 'nPush', 'fPush', 't0Push', 'tfPush')
+    'nPull', 'fPull', 't0Pull', 'tfPull', ...
+    'nPush', 'fPush', 't0Push', 'tfPush', 'M', 'Lambda', 'Psi')
 
 if strcmp(geometry, 'chain')
     
@@ -58,6 +59,14 @@ elseif nPush > 1
         num2str(fPush, '%d') ' pN (\epsilon = ' num2str(epsilon0Push, '%.2f') ...
         sprintf(') over [%.1f, %.1f] ps', t0Push*1000, tfPush*1000) ] ];
     
+end
+
+if M ~= 0
+    
+    titleLine = [ titleLine [ 'Channel break after ' num2str(M, '%d') ' wavelengths, ' ...
+        '\lambda_R/\lambda_L = ' num2str(Lambda, '%.2f') ...
+        ', V_R/V_L = ' num2str(Psi, '%.2f') ] ];
+
 end
 
 theTitle = titleLine{1};

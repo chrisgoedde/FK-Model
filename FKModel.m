@@ -153,17 +153,36 @@ if strcmp(geometry, 'chain')
 elseif strcmp(geometry(1), 's')
     
     stretch = str2double(geometry(2:end));
-    [ phi0, rho0 ] = solitonIC(N, 0, stretch, wavelengthFactor, epsilon0, beta, gamma, 0);
+    if stretch ~= 0 || M == 0
+        
+        [ phi0, rho0 ] = solitonIC(N, 0, stretch, wavelengthFactor, epsilon0, beta, gamma, 0);
+        
+    else
+        
+        phi0 = wavelengthFactor * channelMinima(N, M, Lambda);
+        rho0 = zeros(N, 1);
+        
+    end
 
 elseif strcmp(geometry(1), 'e')
     
-    stretch = str2double(geometry(2:end));
-    [ phi0, rho0 ] = solitonIC(N, 0, stretch, wavelengthFactor, epsilon0, beta, gamma, 0);
+    stretch = str2double(geometry(2:end)); 
+    if stretch ~= 0 || M == 0
+        
+        [ phi0, rho0 ] = solitonIC(N, 0, stretch, wavelengthFactor, epsilon0, beta, gamma, 0);
+        
+    else
+        
+        phi0 = wavelengthFactor * channelMinima(N, M, Lambda);
+        rho0 = zeros(N, 1);
+        
+    end
     
     fprintf('Equilibrating initial condition ...\n')
     
-    initForce(0*epsilon, 0*epsilonPush, tau0Push, taufPush, ...
+    initDrivingForce(0*epsilon, 0*epsilonPush, tau0Push, taufPush, ...
         0*epsilonPull, tau0Pull, taufPull);
+    initSubstrateForce(M, Lambda, Psi);
     
     [ ~, phi, rho, ~, ~ ] = solveFK((0.05*1e-9)/t0, round(0.05/1e-4), ...
         trimOutput(round(0.05/1e-4)), phi0, ...
@@ -219,8 +238,9 @@ if ~strcmp(methodName, '2D')
         
     end
     
-    initForce(epsilon, epsilonPush, tau0Push, taufPush, ...
+    initDrivingForce(epsilon, epsilonPush, tau0Push, taufPush, ...
         epsilonPull, tau0Pull, taufPull);
+    initSubstrateForce(M, Lambda, Psi);
     
     [ tau, phi, rho, phiAvg, rhoAvg ] = solveFK(tauf, nTime, nOut, phi0, ...
         rho0, delta, gamma, alpha, beta, etaPrime, Omega, method);
@@ -249,7 +269,7 @@ elapsed = toc(tStart)/60;
 if elapsed > 3
     fprintf('Elapsed time using %s: %d minutes.\n', methodName, round(elapsed))
 elseif elapsed > 1
-    fprintf('Elapsed time using %s: %d minutes.\n', methodName, round(elapsed, 1))
+    fprintf('Elapsed time using %s: %.1f minutes.\n', methodName, round(elapsed, 1))
 else
     fprintf('Elapsed time using %s: %d seconds.\n', methodName, round(elapsed*60))
 end

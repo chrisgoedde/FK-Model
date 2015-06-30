@@ -26,6 +26,9 @@ function [ pathFormats, pathValues, runNumber ] = parseArguments(varargin)
 % 'Pull Force' -> set fPull
 % 'Pull Start' -> set t0Pull
 % 'Pull End' -> set tfPull
+% 'Channel Divide' -> set M
+% 'Channel Wavelength' -> set Lambda
+% 'Channel Potential' -> set Psi
 % '2D Spring' -> set transverse spring constant for 2D FK model
 
 runNumber = 1; % default run number for reading in data
@@ -131,6 +134,18 @@ for i = 1:length(varargin)/2
             
             tfPull = theValue/1000;
             
+        case 'Channel Divide'
+            
+            M = theValue;
+            
+        case 'Channel Wavelength'
+            
+            Lambda = theValue;
+            
+        case 'Channel Potential'
+            
+            Psi = theValue;
+            
         otherwise
             
             fprintf('No valid parameter ''%s''.\n', theString);
@@ -173,13 +188,24 @@ elseif fPull == 0
     
 end
 
+if M == 0
+    
+    Lambda = 1;
+    Psi = 1;
+    
+elseif Lambda == 1 && Psi == 1
+    
+    M = 0;
+    
+end
+
 % Save the last set of values to a hostname-specific default file.
 
 save(FKDefaults, 'N0', 'S', 'theType', 'f0', 'bathTemp', 'tf', ...
     'eta', 'springFactor', 'spacingFactor', ...
     'methodName', 'geometry', 'folderName', ...
     'nPush', 'fPush', 't0Push', 'tfPush', ...
-    'nPull', 'fPull', 't0Pull', 'tfPull');
+    'nPull', 'fPull', 't0Pull', 'tfPull', 'M', 'Lambda', 'Psi');
 
 % Make a cell array for the path for reading/writing the data.
 
@@ -194,10 +220,10 @@ else
 end
 
 pathFormats = { '%s', '%s', 'type = %d',  'N0 = %d', 'S = %d', 'T = %d K', ...
-    'eta = %.2e Hz', 'channel = uniform', 'spring = (%.3f, %.3f)', 'f = %.2e pN' ...
+    'eta = %.2e Hz', 'channel = (%d, %.2f, %.2f)', 'spring = (%.3f, %.3f)', 'f = %.2e pN' ...
     'push = (%d, %d pN, %.1f ps, %.1f ps)', ...
     'pull = (%d, %d pN, %.1f ps, %.1f ps)' };
-pathValues = { folderName, BC, theType, N0, S, bathTemp, eta, [], ...
+pathValues = { folderName, BC, theType, N0, S, bathTemp, eta, [ M, Lambda, Psi ], ...
     [ springFactor, spacingFactor ], f0 ...
     [ nPush, fPush, t0Push*1000, tfPush*1000 ], ...
     [ nPull, fPull, t0Pull*1000, tfPull*1000 ] };

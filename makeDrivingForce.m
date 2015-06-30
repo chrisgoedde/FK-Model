@@ -1,6 +1,6 @@
-function externalForce = makeForce(tau)
+function externalForce = makeDrivingForce(tau)
 
-[ epsilon, epsilonPush, tau0Push, taufPush, epsilonPull, tau0Pull, taufPull ] = initForce();
+[ epsilon, epsilonPush, tau0Push, taufPush, epsilonPull, tau0Pull, taufPull ] = initDrivingForce();
 
 numTimes = length(tau);
 N = length(epsilon);

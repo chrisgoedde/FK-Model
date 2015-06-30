@@ -21,7 +21,7 @@ load(sprintf('%s/%sConstants.mat', readPathName, geometry));
 
 [ tau, phi, ~, ~, ~ ] = loadDynamics(readPathName, geometry, runNumber);
 
-[ stretch, offset ] = findChainPosition(phi, wavelengthFactor, alpha);
+[ stretch, offset ] = findChainPosition(phi, wavelengthFactor, M, Lambda, alpha);
 
 theTitle = makeTitle(alpha, beta, gamma, kB*bathTemp/V0, epsilon0Pull, epsilon0Push, runNumber);
 

@@ -83,25 +83,13 @@ rhoSum = ySum(:, N+1:2*N)';
         dphi = rho.*delta;
         a = -gamma.*stretch;
         b = circshift(gamma, -1).*circshift(stretch, -1);
-        c = -beta*(rho+sign(rho).*drho) - sin(phi);
+        c = -beta*(rho+sign(rho).*drho);
         
-        d = makeForce(tau);
+        d = makeDrivingForce(tau);
         
-%         d = epsilon;
-%         
-%         if tau >= t0Push && tau <= tfPush
-%             
-%             d = d + epsilonPush;
-%             
-%         end
-%         
-%         if tau >= t0Pull && tau <= tfPull
-%             
-%             d = d + epsilonPull;
-%             
-%         end
-        
-        drho = a + b + c + d;
+        e = makeSubstrateForce(phi);
+                
+        drho = a + b + c + d + e;
         
         dy = [ dphi ; drho ];
         

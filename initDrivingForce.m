@@ -1,4 +1,4 @@
-function [ epsilonOut, epsilonPushOut, tau0PushOut, taufPushOut, epsilonPullOut, tau0PullOut, taufPullOut ] = initForce(varargin)
+function [ epsilonOut, epsilonPushOut, tau0PushOut, taufPushOut, epsilonPullOut, tau0PullOut, taufPullOut ] = initDrivingForce(varargin)
 
 persistent epsilon epsilonPush tau0Push taufPush epsilonPull tau0Pull taufPull
 
