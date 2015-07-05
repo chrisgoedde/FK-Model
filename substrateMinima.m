@@ -1,4 +1,4 @@
-function phi = channelMinima(N, M, Lambda)
+function phi = substrateMinima(N, M, Lambda)
 
 range = (0:N-1)';
 

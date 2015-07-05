@@ -25,11 +25,11 @@ load(sprintf('%s/%sConstants.mat', readPathName, geometry));
 % rhoAvg = rhoAvg';
 
 initDrivingForce(epsilon, epsilonPush, tau0Push, taufPush, ...
-        epsilonPull, tau0Pull, taufPull, phiTug, taufTug, gammaTug);
+        epsilonPull, tau0Pull, taufPull, phiTug, taufTug, gammaTug, startTug);
 initSubstrateForce(M, Lambda, Psi);
-[ springForceLeft, springForceRight, dampingForce, drivingForce, substrateForce ] = findChainForces(tau, phi, rho, alpha, gamma, beta);
+[ springForceLeft, springForceRight, dampingForce, drivingForce, substrateForce ] = findChainForces(tau, phi, rho, alphaVector, gammaVector, beta);
 
-theTitle = makeTitle(alpha, beta, gamma, kB*bathTemp/V0, epsilon0Pull, epsilon0Push, runNumber);
+theTitle = makeTitle(runNumber);
 
 figure;
 
@@ -37,27 +37,15 @@ figure;
 %     + potentialForce(partNum, :) ...
 %     + drivingForce(partNum, :) + dampingForce(partNum, :);
 
-time = t0*tau*1e9;
-if max(time) <= 0.01
-    
-    time = time*1e3;
-    timeUnit = 'ps';
-    
-else
-    
-    timeUnit = 'ns';
-    
-end
-
-plot(time, springForceLeft(partNum, :), 'linewidth', 2), grid on, box on, hold on
-plot(time, springForceRight(partNum, :), 'linewidth', 2), grid on, box on, hold on
-plot(time, substrateForce(partNum, :), 'linewidth', 2)
-plot(time, drivingForce(partNum, :), 'linewidth', 2)
-plot(time, dampingForce(partNum, :), 'linewidth', 2)
+plot(tau, springForceLeft(partNum, :), 'linewidth', 2), grid on, box on, hold on
+plot(tau, springForceRight(partNum, :), 'linewidth', 2), grid on, box on, hold on
+plot(tau, substrateForce(partNum, :), 'linewidth', 2)
+plot(tau, drivingForce(partNum, :), 'linewidth', 2)
+plot(tau, dampingForce(partNum, :), 'linewidth', 2)
 % plot(time, totalForce, 'linewidth', 2)
 
 set(gca, 'fontsize', fontSize)
-xlabel(sprintf('time (%s)', timeUnit))
+xlabel('Dimensionless time')
 ylabel(sprintf('Dimensionless force on molecule %d', partNum))
 
 % legend('Left Spring', 'Right Spring', 'Substrate', 'External', 'Damping', 'Total', 'location', 'best')

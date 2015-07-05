@@ -49,5 +49,6 @@ v = v + fluctuation*randn(size(v));
 % plot(moleculeIndex, v, 'o')
 
 u = u + 2*pi*wavelengthFactor*(0:(N-1))';
+u = u - 2*pi * numKinks;
 
 end

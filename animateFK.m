@@ -1,9 +1,5 @@
 function animateFK(saveMovie, varargin)
 
-alpha = [];
-gamma = [];
-beta = [];
-
 [ pathFormats, pathValues, runNumber ] = parseArguments(varargin{:});
 
 load(FKDefaults, 'geometry')
@@ -19,11 +15,13 @@ end
 
 load(sprintf('%s/%sConstants.mat', readPathName, geometry));
 
+disp(nOut)
+
 [ tau, phi, ~, ~, ~ ] = loadDynamics(readPathName, geometry, runNumber);
 
-[ stretch, offset ] = findChainPosition(phi, wavelengthFactor, M, Lambda, alpha);
+[ stretch, offset ] = findChainPosition(phi, wavelengthFactor, M, Lambda, alphaVector);
 
-theTitle = makeTitle(alpha, beta, gamma, kB*bathTemp/V0, epsilon0Pull, epsilon0Push, runNumber);
+theTitle = makeTitle(runNumber);
 
 moleculeIndex = (1:N)';
 
@@ -57,7 +55,7 @@ xM = get(gca, 'xlim');
 yT = yM(1) + 0.9*(yM(2)-yM(1));
 xT = xM(1) + 0.7*(xM(2)-xM(1));
 
-handle = text(xT, yT, sprintf('time = %.1f ps', t0*tau(1)*1e12));
+handle = text(xT, yT, sprintf('time = %.1f', tau(1)));
 set(handle, 'fontsize', 14)
 
 title(theTitle)
@@ -101,7 +99,7 @@ for i = 2:size(stretch, 2)
    
     set(p, 'ydata', offset(:, i)/(2*pi*wavelengthFactor));
 
-    set(handle, 'string', sprintf('time = %.1f ps', t0*tau(i)*1e12))
+    set(handle, 'string', sprintf('time = %.1f', tau(i)))
 
     if saveMovie
         

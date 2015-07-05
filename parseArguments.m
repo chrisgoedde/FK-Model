@@ -1,41 +1,42 @@
 function [ pathFormats, pathValues, runNumber ] = parseArguments(varargin)
-% [ f0, bathTemp, tf, eta, runNumber, methodName, folderName, pathName ] = parseArguments(varargin)
+% [ pathFormats, pathValues, runNumber ] = parseArguments(varargin)
 % Parse the variable argument list for FKModel.m and other functions.
-% Any arguments not specified are given the default values below.
+% Any arguments not specified are given the default values read in from
+% the local FKDefaults file.
 % Arguments should have the form: 'Constant', value.
 % Values are written out to file FKDefaults-hostname.mat
 % Possible arguments and variables are
 % 'N0' -> sets N0, the number of carbon rings
 % 'S' -> sets S, where N = N0 + S is the number of water molecules
-% 'Type' -> sets type, the type of nanotube
-% 'Forcing' -> sets f0
-% 'Temperature' -> sets bathTemp
-% 'Duration' -> sets tf
-% 'Damping' -> sets eta
-% 'Spring' -> sets springFactor
-% 'Spacing' -> sets spacingFactor
+% 'Mass' -> sets dimensionless mass, mu
+% 'Forcing' -> sets dimensionless forcing, epsilon
+% 'Temperature' -> sets dimensionless temperature, Theta
+% 'Duration' -> sets dimensionless duration, tauf
+% 'Damping' -> sets dimensonless damping, beta
+% 'Spring' -> sets dimensionless spring constant, gamma
+% 'Spacing' -> sets dimensionless spring length, alpha
 % 'Integration Method' -> sets methodName
 % 'Save Folder' -> sets folderName
 % 'Run' -> sets runNumber
 % 'Geometry' -> set geometry to 'ring' or 'chain'
 % 'Push' -> set nPush
-% 'Push Force' -> set fPush
-% 'Push Start' -> set t0Push
-% 'Push End' -> set tfPush
+% 'Push Force' -> set epsilonPush
+% 'Push Start' -> set tau0Push
+% 'Push End' -> set taufPush
 % 'Pull' -> set nPull
-% 'Pull Force' -> set fPull
-% 'Pull Start' -> set t0Pull
-% 'Pull End' -> set tfPull
-% 'Channel Divide' -> set M
-% 'Channel Wavelength' -> set Lambda
-% 'Channel Potential' -> set Psi
-% 'Tug Distance' -> set nPull to -1 and fPull to pulling distance, in
-% substrate wavelengths
-% 'Tug End' -> set t0Pull to 0 and tfPull to pulling duration
+% 'Pull Force' -> set epsilonPull
+% 'Pull Start' -> set tau0Pull
+% 'Pull End' -> set taufPull
+% 'Substrate Divide' -> set M
+% 'Substrate Wavelength' -> set Lambda
+% 'Substrate Potential' -> set Psi
+% 'Tug Distance' -> sets dTug to pulling distance, in substrate wavelengths
+% 'Tug End' -> set taufTug to pulling duration
+% 'Tug Spring' -> set strength of tugging spring, gammaTug
 % '2D Spring' -> set transverse spring constant for 2D FK model
 
 runNumber = 1; % default run number for reading in data
-Gamma = 1; % default 2D quadratic spring constant
+gamma2D = 1; % default 2D quadratic spring constant
 
 load(FKDefaults)
 
@@ -52,37 +53,37 @@ for i = 1:length(varargin)/2
             
             N0 = theValue;
             
-        case 'Type'
-            
-            theType = theValue;
-            
         case 'S'
             
             S = theValue;
             
+        case 'Mass'
+            
+            mu = theValue;
+            
         case 'Temperature'
             
-            bathTemp = theValue;
+            Theta = theValue;
             
         case 'Forcing'
             
-            f0 = theValue;
+            epsilon = theValue;
             
         case 'Damping'
             
-            eta = theValue;
+            beta = theValue;
             
         case 'Spring'
             
-            springFactor = theValue;
+            gamma = theValue;
             
         case 'Spacing'
             
-            spacingFactor = theValue;
+            alpha = 2*pi * theValue;
             
         case 'Duration'
             
-            tf = theValue;
+            tauf = theValue;
             
         case 'Integration Method'
             
@@ -95,7 +96,6 @@ for i = 1:length(varargin)/2
         case 'Run'
             
             runNumber = theValue;
-            fprintf('Setting runNumber to %d\n', runNumber);
             
         case 'Geometry'
             
@@ -103,7 +103,7 @@ for i = 1:length(varargin)/2
             
         case '2D Spring'
             
-            Gamma = theValue;
+            gamma2D = theValue;
             
         case 'Push'
             
@@ -111,15 +111,15 @@ for i = 1:length(varargin)/2
             
         case 'Push Force'
             
-            fPush = theValue;
+            epsionPush = theValue;
             
         case 'Push Start'
             
-            t0Push = theValue/1000;
+            tau0Push = theValue/1000;
             
         case 'Push End'
             
-            tfPush = theValue/1000;
+            taufPush = theValue/1000;
             
         case 'Pull'
             
@@ -127,23 +127,27 @@ for i = 1:length(varargin)/2
             
         case 'Pull Force'
             
-            fPull = theValue;
+            epsilonPull = theValue;
             
         case 'Pull Start'
             
-            t0Pull = theValue/1000;
+            tau0Pull = theValue/1000;
             
         case 'Pull End'
             
-            tfPull = theValue/1000;
+            taufPull = theValue/1000;
             
-        case 'Channel Divide'
+        case 'Substrate Divide'
             
             M = theValue;
             
-        case 'Channel Wavelength'
+        case 'Substrate Wavelength'
             
             Lambda = theValue;
+            
+        case 'Substrate Potential'
+            
+            Psi = theValue;
             
         case 'Tug Distance'
             
@@ -151,15 +155,11 @@ for i = 1:length(varargin)/2
             
         case 'Tug End'
             
-            tfTug = theValue/1000;
+            taufTug = theValue/1000;
             
         case 'Tug Spring'
             
-            strengthTug = theValue;
-            
-        case 'Channel Potential'
-            
-            Psi = theValue;
+            gammaTug = theValue;
             
         otherwise
             
@@ -177,36 +177,36 @@ end
 
 if dTug == 0
     
-    tfTug = 0;
-    strengthTug = 1;
+    taufTug = 0;
+    gammaTug = 1;
     
 end
 
 if nPush == 0
     
-    fPush = 0;
-    t0Push = 0;
-    tfPush = 0;
+    epsionPush = 0;
+    tau0Push = 0;
+    taufPush = 0;
     
-elseif fPush == 0
+elseif epsionPush == 0
     
     nPush = 0;
-    t0Push = 0;
-    tfPush = 0;
+    tau0Push = 0;
+    taufPush = 0;
     
 end
 
 if nPull == 0
     
-    fPull = 0;
-    t0Pull = 0;
-    tfPull = 0;
+    epsilonPull = 0;
+    tau0Pull = 0;
+    taufPull = 0;
     
-elseif fPull == 0
+elseif epsilonPull == 0
     
     nPull = 0;
-    t0Pull = 0;
-    tfPull = 0;
+    tau0Pull = 0;
+    taufPull = 0;
     
 end
 
@@ -223,12 +223,12 @@ end
 
 % Save the last set of values to a hostname-specific default file.
 
-save(FKDefaults, 'N0', 'S', 'theType', 'f0', 'bathTemp', 'tf', ...
-    'eta', 'springFactor', 'spacingFactor', ...
+save(FKDefaults, 'N0', 'S', 'epsilon', 'mu', 'Theta', 'tauf', ...
+    'beta', 'gamma', 'alpha', ...
     'methodName', 'geometry', 'folderName', ...
-    'nPush', 'fPush', 't0Push', 'tfPush', ...
-    'nPull', 'fPull', 't0Pull', 'tfPull', 'M', 'Lambda', 'Psi', ...
-    'dTug', 'tfTug', 'strengthTug');
+    'nPush', 'epsilonPush', 'tau0Push', 'taufPush', ...
+    'nPull', 'epsilonPull', 'tau0Pull', 'taufPull', 'M', 'Lambda', 'Psi', ...
+    'dTug', 'taufTug', 'gammaTug');
 
 % Make a cell array for the path for reading/writing the data.
 
@@ -242,42 +242,20 @@ else
     
 end
 
-pathFormats = { '%s', '%s', 'type = %d',  'N0 = %d', 'S = %d', 'T = %d K', ...
-    'eta = %.2e Hz', 'channel = (%d, %.2f, %.2f)', 'spring = (%.3f, %.3f)', ...
-    'f = %.2e pN' 'push = (%d, %d pN, %.1f ps, %.1f ps)', ...
-    'pull = (%d, %d pN, %.1f ps, %.1f ps)' };
-pathValues = { folderName, BC, theType, N0, S, bathTemp, eta, [ M, Lambda, Psi ], ...
-    [ springFactor, spacingFactor ], f0, [ nPush, fPush, t0Push*1000, tfPush*1000 ], ...
-    [ nPull, fPull, t0Pull*1000, tfPull*1000 ] };
-
-if tfTug >= 1
-    
-    pathFormats = [ pathFormats, 'tug = (%.1f, %.1f, %.1f ns)' ];
-    pathValues = [ pathValues, [ dTug, strengthTug, tfTug ] ];
-    
-else
-    
-    pathFormats = [ pathFormats, 'tug = (%.1f, %.1f, %.1f ps)' ];
-    pathValues = [ pathValues, [ dTug, strengthTug, tfTug*1000 ] ];
-    
-end
-
-if tf >= 1
-    
-    pathFormats = [ pathFormats, 'tf = %.1f ns', 'method = %s' ];
-    pathValues = [ pathValues, tf, methodName ];
-    
-else
-    
-    pathFormats = [ pathFormats, 'tf = %.1f ps', 'method = %s' ];
-    pathValues = [ pathValues, tf*1000, methodName ];
-    
-end
+pathFormats = { '%s', '%s', 'N0 = %d', 'S = %d', 'mu = %.1f', 'Theta = %.2f', ...
+    'beta = %.2e', 'substrate = (%d, %.2f, %.2f)', 'spring = (%.2f, %.2f)', ...
+    'epsilon = %.3f' 'push = (%d, %.3f, %.1f, %.1f)', ...
+    'pull = (%d, %.3f, %.1f, %.1f)', 'tug = (%.1f, %.1f, %.1f)', ...
+    'tauf = %.1f', 'method = %s' };
+pathValues = { folderName, BC, N0, S, mu, Theta, beta, [ M, Lambda, Psi ], ...
+    [ gamma, alpha/(2*pi) ], epsilon, [ nPush, epsionPush, tau0Push, taufPush ], ...
+    [ nPull, epsilonPull, tau0Pull, taufPull ] [ dTug, taufTug, gammaTug ], ...
+    tauf, methodName };
 
 if strcmp(methodName, '2D')
     
-    pathFormats = [ pathFormats, 'Gamma = %.2d' ];
-    pathValues = [ pathValues, Gamma ];
+    pathFormats = [ pathFormats, 'gamma2D = %.2f' ];
+    pathValues = [ pathValues, gamma2D ];
     
 end
 

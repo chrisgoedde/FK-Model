@@ -1,4 +1,5 @@
-function [ t, phif, rhof, phiSum, rhoSum ] = solveFK(tf, nTime, nOut, phi0, rho0, delta, gamma, alpha, beta, betaPrime, Omega, method)
+function [ t, phif, rhof, phiSum, rhoSum ] ...
+    = solveFK(tf, nTime, nOut, phi0, rho0, deltaVector, gammaVector, alphaVector, betaVector, Omega, method)
 
 y0 = [ phi0; rho0 ];
 N = length(phi0);
@@ -76,21 +77,25 @@ rhoSum = ySum(:, N+1:2*N)';
         phi = y0(1:N);
         rho = y0(N+1:2*N);
         
-        stretch = phi - circshift(phi, 1) - alpha;
-        drho = betaPrime*0.25*((1-sign(rho-circshift(rho, 1))).*abs(rho-circshift(rho, 1)) ...
-            + (1-sign(rho-circshift(rho, -1))).*abs(rho-circshift(rho, -1)));
+        stretch = phi - circshift(phi, 1) - alphaVector;
         
-        dphi = rho.*delta;
-        a = -gamma.*stretch;
-        b = circshift(gamma, -1).*circshift(stretch, -1);
-        c = -beta*(rho+sign(rho).*drho);
+        dphi = rho.*deltaVector;
+        a = -gammaVector.*stretch;
+        b = circshift(gammaVector, -1).*circshift(stretch, -1);
+        c = -betaVector*rho;
         
         d = makeDrivingForce(tau, phi);
         
         e = makeSubstrateForce(phi);
                 
         drho = a + b + c + d + e;
-        
+%         drho = a + b + c;
+%         disp(phi')
+%         disp(stretch')
+%         disp(gammaVector')
+%         disp(drho')
+%         pause
+       
         dy = [ dphi ; drho ];
         
     end

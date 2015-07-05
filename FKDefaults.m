@@ -24,41 +24,42 @@ if ~exist(name, 'file')
     else
         
         N0 = 100; % default number of carbon rings
-        theType = 4; % default to (4, 4) nanotube
-        S = -1; % default to one fewer water molecule
-        f0 = 1e-2; % default external forcing, in pN
-        bathTemp = 20; % default temperature, in K
-        tf = 10; % default integration time, in ns
-        eta = 3e9; % default damping, in Hz
-        springFactor = 1; % modification of water spring constant
-        spacingFactor = 1; % modificaiton of water spacing constant
+        S = 0; % default to molecule/ring mismatch
+        mu = 1; % default dimensionless mass of particles
+        epsilon = 0; % default dimensionless external forcing
+        Theta = 0; % default dimensionless temperature
+        tauf = 1000; % default integration time, in ns
+        beta = 3e-3; % default dimensionless damping
+        gamma = 15; % default dimensionless spring constant
+        alpha = 2*pi; % default dimensionless spring rest length
         methodName = 'ode45'; % default method of integration
         folderName = 'Results'; % default save folder for data
         geometry = 'ring'; % default geometry (alternate: 'chain')
         nPush = 0; % default number of molecules on left to be pushed
-        fPush = 0; % default pushing force, in pN
-        t0Push = 0; % default start time for pushing, in ps
-        tfPush = 0; % default end time for pushing, in ps
+        epsilonPush = 0; % default dimensionless pushing force
+        tau0Push = 0; % default dimensionless start time for pushing
+        taufPush = 0; % default dimensionless end time for pushing
         
         nPull = 0; % default number of molecules on right to be pulled
-        fPull = 0; % default pulling force, in pN
-        t0Pull = 0; % default start time for pulling, in ps
-        tfPull = 0; % default end time for pulling, in ps
+        epsilonPull = 0; % default dimensionless pulling force
+        tau0Pull = 0; % default dimensionless start time for pulling
+        taufPull = 0; % default dimensionless end time for pulling
         
         M = 0; % default divide in substrate
         Lambda = 1; % default wavelength ratio in substrate
         Psi = 1; % default potential height ratio in substrate
         
         dTug = 0; % default distance to pull right end (in substrate wavelengths)
-        tfTug = 0; % default duration of tugging
-        strengthTug = 1; % default strength of tugging, relative to springs
+        taufTug = 0; % default duration of tugging
+        gammaTug = 15; % default strength of tugging, relative to springs
         
-        save(name, 'N0', 'theType', 'S', 'f0', 'bathTemp', 'tf', 'eta', ...
-            'springFactor', 'spacingFactor', 'methodName', 'folderName', ...
-            'geometry', 'nPush', 'fPush', 't0Push', 'tfPush', ...
-            'nPull', 'fPull', 't0Pull', 'tfPull', 'M', 'Lambda', 'Psi', ...
-            'dTug', 'tfTug', 'strengthTug')
-        
+        save(name, 'N0', 'S', 'epsilon', 'mu', 'Theta', 'tauf', ...
+            'beta', 'gamma', 'alpha', ...
+            'methodName', 'geometry', 'folderName', ...
+            'nPush', 'epsilonPush', 'tau0Push', 'taufPush', ...
+            'nPull', 'epsilonPull', 'tau0Pull', 'taufPull', 'M', 'Lambda', 'Psi', ...
+            'dTug', 'taufTug', 'gammaTug');
+
     end
     
 end
