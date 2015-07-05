@@ -49,10 +49,15 @@ if ~exist(name, 'file')
         Lambda = 1; % default wavelength ratio in substrate
         Psi = 1; % default potential height ratio in substrate
         
+        dTug = 0; % default distance to pull right end (in substrate wavelengths)
+        tfTug = 0; % default duration of tugging
+        strengthTug = 1; % default strength of tugging, relative to springs
+        
         save(name, 'N0', 'theType', 'S', 'f0', 'bathTemp', 'tf', 'eta', ...
             'springFactor', 'spacingFactor', 'methodName', 'folderName', ...
             'geometry', 'nPush', 'fPush', 't0Push', 'tfPush', ...
-            'nPull', 'fPull', 't0Pull', 'tfPull', 'M', 'Lambda', 'Psi')
+            'nPull', 'fPull', 't0Pull', 'tfPull', 'M', 'Lambda', 'Psi', ...
+            'dTug', 'tfTug', 'strengthTug')
         
     end
     

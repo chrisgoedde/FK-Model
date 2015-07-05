@@ -85,7 +85,7 @@ rhoSum = ySum(:, N+1:2*N)';
         b = circshift(gamma, -1).*circshift(stretch, -1);
         c = -beta*(rho+sign(rho).*drho);
         
-        d = makeDrivingForce(tau);
+        d = makeDrivingForce(tau, phi);
         
         e = makeSubstrateForce(phi);
                 

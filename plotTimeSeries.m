@@ -26,7 +26,7 @@ load(sprintf('%s/%sConstants.mat', readPathName, geometry));
 
 [ KE, PE ] = findChainEnergy(phi, rho, alpha, delta, gamma);
 initDrivingForce(epsilon, epsilonPush, tau0Push, taufPush, ...
-        epsilonPull, tau0Pull, taufPull);
+        epsilonPull, tau0Pull, taufPull, phiTug, taufTug, gammaTug);
 initSubstrateForce(M, Lambda, Psi);
 [ springForceLeft, springForceRight, dampingForce, drivingForce, substrateForce ] = findChainForces(tau, phi, rho, alpha, gamma, beta);
 

@@ -29,6 +29,9 @@ function [ pathFormats, pathValues, runNumber ] = parseArguments(varargin)
 % 'Channel Divide' -> set M
 % 'Channel Wavelength' -> set Lambda
 % 'Channel Potential' -> set Psi
+% 'Tug Distance' -> set nPull to -1 and fPull to pulling distance, in
+% substrate wavelengths
+% 'Tug End' -> set t0Pull to 0 and tfPull to pulling duration
 % '2D Spring' -> set transverse spring constant for 2D FK model
 
 runNumber = 1; % default run number for reading in data
@@ -68,7 +71,7 @@ for i = 1:length(varargin)/2
         case 'Damping'
             
             eta = theValue;
-
+            
         case 'Spring'
             
             springFactor = theValue;
@@ -76,7 +79,7 @@ for i = 1:length(varargin)/2
         case 'Spacing'
             
             spacingFactor = theValue;
-
+            
         case 'Duration'
             
             tf = theValue;
@@ -142,6 +145,18 @@ for i = 1:length(varargin)/2
             
             Lambda = theValue;
             
+        case 'Tug Distance'
+            
+            dTug = theValue;
+            
+        case 'Tug End'
+            
+            tfTug = theValue/1000;
+            
+        case 'Tug Spring'
+            
+            strengthTug = theValue;
+            
         case 'Channel Potential'
             
             Psi = theValue;
@@ -160,6 +175,13 @@ if ~strcmp(geometry, 'ring')
     
 end
 
+if dTug == 0
+    
+    tfTug = 0;
+    strengthTug = 1;
+    
+end
+
 if nPush == 0
     
     fPush = 0;
@@ -171,7 +193,7 @@ elseif fPush == 0
     nPush = 0;
     t0Push = 0;
     tfPush = 0;
-
+    
 end
 
 if nPull == 0
@@ -205,7 +227,8 @@ save(FKDefaults, 'N0', 'S', 'theType', 'f0', 'bathTemp', 'tf', ...
     'eta', 'springFactor', 'spacingFactor', ...
     'methodName', 'geometry', 'folderName', ...
     'nPush', 'fPush', 't0Push', 'tfPush', ...
-    'nPull', 'fPull', 't0Pull', 'tfPull', 'M', 'Lambda', 'Psi');
+    'nPull', 'fPull', 't0Pull', 'tfPull', 'M', 'Lambda', 'Psi', ...
+    'dTug', 'tfTug', 'strengthTug');
 
 % Make a cell array for the path for reading/writing the data.
 
@@ -220,14 +243,25 @@ else
 end
 
 pathFormats = { '%s', '%s', 'type = %d',  'N0 = %d', 'S = %d', 'T = %d K', ...
-    'eta = %.2e Hz', 'channel = (%d, %.2f, %.2f)', 'spring = (%.3f, %.3f)', 'f = %.2e pN' ...
-    'push = (%d, %d pN, %.1f ps, %.1f ps)', ...
+    'eta = %.2e Hz', 'channel = (%d, %.2f, %.2f)', 'spring = (%.3f, %.3f)', ...
+    'f = %.2e pN' 'push = (%d, %d pN, %.1f ps, %.1f ps)', ...
     'pull = (%d, %d pN, %.1f ps, %.1f ps)' };
 pathValues = { folderName, BC, theType, N0, S, bathTemp, eta, [ M, Lambda, Psi ], ...
-    [ springFactor, spacingFactor ], f0 ...
-    [ nPush, fPush, t0Push*1000, tfPush*1000 ], ...
+    [ springFactor, spacingFactor ], f0, [ nPush, fPush, t0Push*1000, tfPush*1000 ], ...
     [ nPull, fPull, t0Pull*1000, tfPull*1000 ] };
+
+if tfTug >= 1
     
+    pathFormats = [ pathFormats, 'tug = (%.1f, %.1f, %.1f ns)' ];
+    pathValues = [ pathValues, [ dTug, strengthTug, tfTug ] ];
+    
+else
+    
+    pathFormats = [ pathFormats, 'tug = (%.1f, %.1f, %.1f ps)' ];
+    pathValues = [ pathValues, [ dTug, strengthTug, tfTug*1000 ] ];
+    
+end
+
 if tf >= 1
     
     pathFormats = [ pathFormats, 'tf = %.1f ns', 'method = %s' ];

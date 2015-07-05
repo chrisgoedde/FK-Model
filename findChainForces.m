@@ -10,7 +10,7 @@ gamma = repmat(gamma, [ 1 numTimes ]);
 springForceLeft = -gamma.*stretch;
 springForceRight = circshift(-springForceLeft, [ -1 0 ]);
 dampingForce = -beta*rho;
-drivingForce = makeDrivingForce(tau);
+drivingForce = makeDrivingForce(tau, phi);
 substrateForce = makeSubstrateForce(phi);
 
 end

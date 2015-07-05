@@ -103,32 +103,24 @@ alpha = (2*pi/lambda)*a;
 alpha(1) = alpha(1) - (2*pi*L/lambda);
 alpha = spacingFactor*alpha;
 
-if nPush + nPull == 0
-    
-    epsilon0 = t0*(f0*1e-12)/p0;
-    epsilon = epsilon0*ones(N, 1);
-    
-    epsilon0Push = 0;
-    epsilon0Pull = 0;
-    epsilonPush = epsilon0Push*ones(N, 1);
-    epsilonPull = epsilon0Pull*ones(N, 1);
-    
-else
-    
-    epsilon0 = 0;
-    epsilon = epsilon0*ones(N, 1);
+epsilon0 = t0*(f0*1e-12)/p0;
+epsilon = epsilon0*ones(N, 1);
 
-    epsilon0Push = t0*(fPush*1e-12)/p0;
-    epsilon0Pull = t0*(fPull*1e-12)/p0;
-    epsilonPush = epsilon0Push*[ ones(nPush, 1); zeros(N-nPush, 1) ];
-    epsilonPull = epsilon0Pull*[ zeros(N-nPull, 1) ; ones(nPull, 1) ];
-
-end
+epsilon0Push = t0*(fPush*1e-12)/p0;
+epsilonPush = epsilon0Push*[ ones(nPush, 1); zeros(N-nPush, 1) ];
+epsilon0Pull = t0*(fPull*1e-12)/p0;
+epsilonPull = epsilon0Pull*[ zeros(N-nPull, 1) ; ones(nPull, 1) ];
 
 tau0Push = (t0Push*1e-9)/t0;
 taufPush = (tfPush*1e-9)/t0;
 tau0Pull = (t0Pull*1e-9)/t0;
 taufPull = (tfPull*1e-9)/t0;
+
+phiTug = Lambda*2*pi*dTug;
+taufTug = (tfTug*1e-9)/t0;
+gammaTug = strengthTug * springFactor*g(end)/g0;
+chainEnd = channelMinima(N, M, Lambda);
+startTug = chainEnd(end); % + 2*pi*Lambda;
 
 beta = t0*eta;
 Omega = t0*dtau*noise/p0;
@@ -181,7 +173,7 @@ elseif strcmp(geometry(1), 'e')
     fprintf('Equilibrating initial condition ...\n')
     
     initDrivingForce(0*epsilon, 0*epsilonPush, tau0Push, taufPush, ...
-        0*epsilonPull, tau0Pull, taufPull);
+        0*epsilonPull, tau0Pull, taufPull, 0, taufTug, gammaTug, startTug);
     initSubstrateForce(M, Lambda, Psi);
     
     [ ~, phi, rho, ~, ~ ] = solveFK((0.05*1e-9)/t0, round(0.05/1e-4), ...
@@ -239,7 +231,7 @@ if ~strcmp(methodName, '2D')
     end
     
     initDrivingForce(epsilon, epsilonPush, tau0Push, taufPush, ...
-        epsilonPull, tau0Pull, taufPull);
+        epsilonPull, tau0Pull, taufPull, phiTug, taufTug, gammaTug, startTug);
     initSubstrateForce(M, Lambda, Psi);
     
     [ tau, phi, rho, phiAvg, rhoAvg ] = solveFK(tauf, nTime, nOut, phi0, ...

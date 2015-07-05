@@ -17,9 +17,20 @@ disp([ 'Pull = (' num2str(nPull, '%d') ', ' num2str(fPull, '%.2e') ' pN, ' ...
     num2str(t0Pull*1000, '%.1f') ' ps, ' num2str(tfPull*1000, '%.1f') ' ps)' ])
 disp([ 'Spring = (' num2str(springFactor, '%.2e') ...
     ', ' num2str(spacingFactor, '%.2e') ')' ])
+if tfTug >= 1
+    disp([ 'Tug = (' num2str(dTug, '%.1f') ', ' num2str(strengthTug, '%.1f') ...
+        ', ' num2str(tfTug, '%.1f') ' ns)' ])
+else
+    disp([ 'Tug = (' num2str(dTug, '%.1f') ', ' num2str(strengthTug, '%.1f') ...
+        ', ' num2str(tfTug*1000, '%.1f') ' ps)' ])
+end
 disp([ 'Channel = (' num2str(M, '%d') ', ' num2str(Lambda, '%.2f')  ', ' ...
     num2str(Psi, '%.2f') ')' ])
-disp([ 'Duration = ' num2str(tf, '%d') ' ns' ])
+if tf >= 1
+    disp([ 'Duration = ' num2str(tf, '%.1f') ' ns' ])
+else
+    disp([ 'Duration = ' num2str(tf*1000, '%.1f') ' ps' ])
+end
 disp([ 'Integration Method = ' methodName ])
 disp([ 'Geometry = ' geometry ])
 
