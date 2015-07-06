@@ -173,6 +173,12 @@ if ~strcmp(geometry, 'ring')
     
     S = 0;
     
+else
+    
+    M = 0;
+    Lambda = 1;
+    Psi = 1;
+    
 end
 
 if dTug == 0

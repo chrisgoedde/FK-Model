@@ -53,7 +53,6 @@ muVector = ones(N, 1); % vector of dimensionless molecule masses
 
 alphaVector = alpha * ones(N, 1); % vector of dimensionless water spacing
 wavelengthFactor = round(alpha/(2*pi));
-sMin = substrateMinima(N, M, Lambda);
 
 % Create the vector of spring constants ... if the geometry is a chain
 % rather than a ring, make the first spring constant zero ... this is the
@@ -63,14 +62,18 @@ sMin = substrateMinima(N, M, Lambda);
 if strcmp(geometry, 'chain') || strcmp(geometry(1), 's') || strcmp(geometry(1), 'e') 
 
     gammaVector = gamma * [ 0 ; ones(N-1, 1) ];
+    sMin = substrateMinima(N, M, Lambda);
+    startTug = sMin(end);
 
 else
     
     gammaVector = gamma * ones(N, 1);
-    
+    sMin = substrateMinima(N0, M, Lambda);
+    startTug = -1;
+
 end
 
-alphaVector(1) = alphaVector(1) - (sMin(end) + 2*pi * Lambda);
+alphaVector(1) = alphaVector(1) - sMin(end);
 
 deltaVector = 1./muVector;
 
@@ -80,7 +83,6 @@ epsilonPushVector = epsilonPush*[ ones(nPush, 1); zeros(N-nPush, 1) ];
 epsilonPullVector = epsilonPull*[ zeros(N-nPull, 1) ; ones(nPull, 1) ];
 
 phiTug = Lambda*2*pi*dTug;
-startTug = sMin(end); % + 2*pi*Lambda;
 
 Omega = sqrt(4*beta*Theta*dtau);
 

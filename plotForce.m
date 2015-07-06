@@ -24,8 +24,8 @@ load(sprintf('%s/%sConstants.mat', readPathName, geometry));
 [ tau, phi, rho, ~, ~ ] = loadDynamics(readPathName, geometry, runNumber);
 % rhoAvg = rhoAvg';
 
-initDrivingForce(epsilon, epsilonPush, tau0Push, taufPush, ...
-        epsilonPull, tau0Pull, taufPull, phiTug, taufTug, gammaTug, startTug);
+initDrivingForce(epsilonVector, epsilonPushVector, tau0Push, taufPush, ...
+        epsilonPullVector, tau0Pull, taufPull, phiTug, taufTug, gammaTug, startTug);
 initSubstrateForce(M, Lambda, Psi);
 [ springForceLeft, springForceRight, dampingForce, drivingForce, substrateForce ] = findChainForces(tau, phi, rho, alphaVector, gammaVector, beta);
 
