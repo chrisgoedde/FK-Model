@@ -1,13 +1,12 @@
 function plotTimeSeries(varargin)
 
 [ pathFormats, pathValues, runNumber ] = parseArguments(varargin{:});
+[ unit ] = setPhysicalConstants(varargin{:});
 
-load(FKDefaults, 'N0', 'eta', 'S', 'f0', 'geometry')
+load(FKDefaults, 'geometry')
 
 readPathName = makePath(pathFormats, pathValues, []);
 
-alpha = [];
-gamma = [];
 beta = [];
 
 fontSize = 14;
@@ -22,35 +21,27 @@ end
 load(sprintf('%s/%sConstants.mat', readPathName, geometry));
 
 [ tau, phi, rho, ~, rhoAvg ] = loadDynamics(readPathName, geometry, runNumber);
-% rhoAvg = rhoAvg';
 
-[ KE, PE ] = findChainEnergy(phi, rho, alpha, delta, gamma);
-initDrivingForce(epsilon, epsilonPush, tau0Push, taufPush, ...
-        epsilonPull, tau0Pull, taufPull, phiTug, taufTug, gammaTug);
-initSubstrateForce(M, Lambda, Psi);
-[ springForceLeft, springForceRight, dampingForce, drivingForce, substrateForce ] = findChainForces(tau, phi, rho, alpha, gamma, beta);
-
-% pAvg = p0*mean(rho);
-% vAvg = pAvg/mAvg;
-c = mean(a) * sqrt(mean(g)/mAvg);
-vSol = c./sqrt(1+(4*p0*eta/(pi*f0*1e-12)).^2);
-% deltaT = (N0*lambda)/vSol;
-% nPer = tf*1e-9/deltaT;
-% periods = linspace(0, tf, nPer);
-
-theTitle = makeTitle(alpha, beta, gamma, kB*bathTemp/V0, epsilon0Pull, epsilon0Push, runNumber);
-
-time = t0*tau*1e9;
-if max(time) <= 0.01
+if unit.timeFactor{2} * tau(end) >= 1000
     
-    time = time*1e3;
-    timeUnit = 'ps';
-    
-else
-    
-    timeUnit = 'ns';
+    unit.timeFactor{2} = unit.timeFactor{2}/1000;
+    unit.timeName = ' ns';
+    unit.timeLabel = '(ns)';
     
 end
+
+time = unit.timeFactor{unit.flag} * tau;
+fF = unit.forceFactor{unit.flag};
+vF = unit.velocityFactor{unit.flag};
+EF = unit.energyFactor{unit.flag};
+
+[ KE, PE ] = findChainEnergy(phi, rho, alphaVector, deltaVector, gammaVector);
+initDrivingForce(epsilonVector, epsilonPushVector, tau0Push, taufPush, ...
+        epsilonPullVector, tau0Pull, taufPull, phiTug, taufTug, gammaTug, startTug);
+initSubstrateForce(M, Lambda, Psi);
+[ springForceLeft, springForceRight, dampingForce, drivingForce, substrateForce ] = findChainForces(tau, phi, rho, alphaVector, gammaVector, beta);
+
+theTitle = makeTitle(unit, runNumber);
 
 f = figure;
 
@@ -61,17 +52,16 @@ set(f, 'position', pos);
 
 subplot(2, 2, 1)
 
-plot(time, p0*sum(substrateForce)*1e12/t0, 'g', 'linewidth', 2)
+plot(time, fF * sum(substrateForce), 'g', 'linewidth', 2)
 grid on, box on, hold on
-plot(time, p0*sum(springForceLeft + springForceRight)*1e12/t0, 'b', 'linewidth', 2) 
-plot(time, p0*sum(dampingForce)*1e12/t0, 'r', 'linewidth', 2)
-plot(time, p0*sum(drivingForce)*1e12/t0, 'k', 'linewidth', 2)
+plot(time, fF * sum(springForceLeft + springForceRight), 'b', 'linewidth', 2) 
+plot(time, fF * sum(dampingForce), 'r', 'linewidth', 2)
+plot(time, fF * sum(drivingForce), 'k', 'linewidth', 2)
 
 set(gca, 'fontsize', fontSize)
-xlabel(sprintf('time (%s)', timeUnit))
-ylabel('force (pN)')
-% set(gca, 'ylim', [ 0 4 ])
-legend('potential', 'spring', 'damping', 'driving', 'location', 'best')
+xlabel(sprintf('time %s', unit.timeLabel{unit.flag}))
+ylabel(sprintf('Force %s', unit.forceLabel{unit.flag}))
+legend('Substrate', 'Spring', 'Damping', 'Driving', 'location', 'best')
 
 title(theTitle)
 
@@ -79,40 +69,22 @@ title(theTitle)
 
 subplot(2, 2, 3)
 
-% whos
-
-% plot(time, vAvg, 'b', 'linewidth', 2), grid on, box on, hold on
-plot(time, p0*mean(rhoAvg)/mAvg, 'k', 'linewidth', 2), grid on, box on, hold on
-plot(time, vSol*abs(S)*ones(size(tau))/N0, 'r', 'linewidth', 2)
-% plot(time, c*abs(S)*ones(size(tau))/N0, 'g', 'linewidth', 2)
-
-% yb = get(gca, 'ylim');
-% set(gca, 'ylim', [ 0 yb(2) ])
-legend('actual', 'Theory', 'location', 'best')
+plot(time, vF * mean(rhoAvg), 'k', 'linewidth', 2), grid on, box on, hold on
 
 set(gca, 'fontsize', fontSize)
-xlabel(sprintf('time (%s)', timeUnit))
-ylabel('flow rate (m/s)')
+xlabel(sprintf('time %s', unit.timeLabel{unit.flag}))
+ylabel(sprintf('flow rate %s', unit.velocityLabel{unit.flag}))
 
 title(theTitle)
 
 subplot(2, 2, 4)
 
-PE0 = 0;
-
-% plot(time, (V0/2)*(PE-PE0)/(N*kB), 'r', 'linewidth', 2), grid on, box on, hold on
-% plot(time, (V0/2)*KE/(N*kB), 'g', 'linewidth', 2)
-
-plot(time, (PE-PE0)/N, 'r', 'linewidth', 2), grid on, box on, hold on
-plot(time, KE/N, 'g', 'linewidth', 2)
+plot(time, EF * PE/N, 'r', 'linewidth', 2), grid on, box on, hold on
+plot(time, EF * KE/N, 'g', 'linewidth', 2)
 
 set(gca, 'fontsize', fontSize)
-xlabel(sprintf('time (%s)', timeUnit))
-ylabel('Dimensionless energy per molecule')
-
-% legend('KE per molecule', 'Barrier height', 'location', 'best')
-
-% legend('Observed', 'Predicted', 'location', 'best')
+xlabel(sprintf('time %s', unit.timeLabel{unit.flag}))
+ylabel(sprintf('Energy per monomer %s', unit.energyLabel{unit.flag}))
 
 legend('Potential', 'Kinetic', 'location', 'best')
 

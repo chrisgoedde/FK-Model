@@ -1,14 +1,11 @@
 function plotEnergy(varargin)
 
 [ pathFormats, pathValues, runNumber ] = parseArguments(varargin{:});
+[ unit ] = setPhysicalConstants(varargin{:});
 
 load(FKDefaults, 'geometry')
 
 readPathName = makePath(pathFormats, pathValues, []);
-
-alpha = [];
-gamma = [];
-beta = [];
 
 fontSize = 14;
 
@@ -22,32 +19,30 @@ end
 load(sprintf('%s/%sConstants.mat', readPathName, geometry));
 
 [ tau, phi, rho, ~, ~ ] = loadDynamics(readPathName, geometry, runNumber);
-% rhoAvg = rhoAvg';
 
-[ KE, PE ] = findChainEnergy(phi, rho, alpha, delta, gamma);
-
-theTitle = makeTitle(alpha, beta, gamma, kB*bathTemp/V0, epsilon0Pull, epsilon0Push, runNumber);
-
-time = t0*tau*1e9;
-if max(time) <= 0.01
+if unit.timeFactor{2} * tau(end) >= 1000
     
-    time = time*1e3;
-    timeUnit = 'ps';
-    
-else
-    
-    timeUnit = 'ns';
+    unit.timeFactor{2} = unit.timeFactor{2}/1000;
+    unit.timeName = ' ns';
+    unit.timeLabel = '(ns)';
     
 end
 
+[ KE, PE ] = findChainEnergy(phi, rho, alphaVector, deltaVector, gammaVector);
+
+theTitle = makeTitle(unit, runNumber);
+
 figure;
 
-plot(time, (V0/2)*PE/(N*kB), 'r', 'linewidth', 2), grid on, box on, hold on
-plot(time, (V0/2)*KE/(N*kB), 'g', 'linewidth', 2)
+tF = unit.timeFactor{unit.flag};
+EF = unit.energyFactor{unit.flag};
+
+plot(tF * tau, EF * PE/N, 'r', 'linewidth', 2), grid on, box on, hold on
+plot(tF * tau, EF * KE/N, 'g', 'linewidth', 2)
 
 set(gca, 'fontsize', fontSize)
-xlabel(sprintf('time (%s)', timeUnit))
-ylabel('Energy per molecule (Kelvin)')
+xlabel(sprintf('time %s', unit.timeLabel{unit.flag}))
+ylabel(sprintf('Energy per monomer %s', unit.energyLabel{unit.flag}))
 
 legend('Potential', 'Kinetic', 'location', 'best')
 

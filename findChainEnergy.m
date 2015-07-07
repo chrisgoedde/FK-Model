@@ -1,16 +1,16 @@
-function [ KE, PE ] = findChainEnergy(phi, rho, alpha, delta, gamma)
+function [ KE, PE ] = findChainEnergy(phi, rho, alphaVector, deltaVector, gammaVector)
 
 [ ~, numTimes ] = size(phi);
 
-alpha = repmat(alpha, [ 1 numTimes ]);
-stretch = (phi - circshift(phi, 1) - alpha);
+alphaVector = repmat(alphaVector, [ 1 numTimes ]);
+stretch = (phi - circshift(phi, 1) - alphaVector);
 
-delta = repmat(delta, [ 1 numTimes ]);
-KE = sum(delta.*(rho.^2)/2);
+deltaVector = repmat(deltaVector, [ 1 numTimes ]);
+KE = sum(deltaVector.*(rho.^2)/2);
 
-gamma = repmat(gamma, [ 1 numTimes ]);
+gammaVector = repmat(gammaVector, [ 1 numTimes ]);
 
-springForceLeft = -gamma.*stretch;
+springForceLeft = -gammaVector.*stretch;
 springForceRight = circshift(-springForceLeft, [ -1 0 ]);
 
 [ M, Lambda, Psi ] = initSubstrateForce;

@@ -77,11 +77,12 @@ rhoSum = ySum(:, N+1:2*N)';
         phi = y0(1:N);
         rho = y0(N+1:2*N);
         
-        stretch = phi - circshift(phi, 1) - alphaVector;
-        
         dphi = rho.*deltaVector;
+
+        stretch = phi - circshift(phi, 1) - alphaVector;
         a = -gammaVector.*stretch;
         b = circshift(gammaVector, -1).*circshift(stretch, -1);
+        
         c = -betaVector*rho;
         
         d = makeDrivingForce(tau, phi);
@@ -89,12 +90,6 @@ rhoSum = ySum(:, N+1:2*N)';
         e = makeSubstrateForce(phi);
                 
         drho = a + b + c + d + e;
-%         drho = a + b + c;
-%         disp(phi')
-%         disp(stretch')
-%         disp(gammaVector')
-%         disp(drho')
-%         pause
        
         dy = [ dphi ; drho ];
         

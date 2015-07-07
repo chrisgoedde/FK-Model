@@ -59,26 +59,26 @@ wavelengthFactor = round(alpha/(2*pi));
 % spring constant that lies to the left of the first mass, connecting it to
 % the last mass in the ring geometry.
 
-if strcmp(geometry, 'chain') || strcmp(geometry(1), 's') || strcmp(geometry(1), 'e') 
+if ~strcmp(geometry, 'ring')
 
     gammaVector = gamma * [ 0 ; ones(N-1, 1) ];
+    alphaVector(1) = 0;
     sMin = substrateMinima(N, M, Lambda);
     startTug = sMin(end);
+    clear sMin
 
 else
     
     gammaVector = gamma * ones(N, 1);
-    sMin = substrateMinima(N0, M, Lambda);
-    startTug = -1;
+    alphaVector(1) = alphaVector(1) - 2*pi * N0;
+    startTug = 0;
 
 end
 
-alphaVector(1) = alphaVector(1) - sMin(end);
 
 deltaVector = 1./muVector;
 
 epsilonVector = epsilon*ones(N, 1);
-
 epsilonPushVector = epsilonPush*[ ones(nPush, 1); zeros(N-nPush, 1) ];
 epsilonPullVector = epsilonPull*[ zeros(N-nPull, 1) ; ones(nPull, 1) ];
 
@@ -139,11 +139,11 @@ else
     
     if S > 0
         
-        [ phi0, rho0 ] = solitonIC(N, 2*S, 0, wavelengthFactor, epsilon, beta, gamma, 0);
+        [ phi0, rho0 ] = solitonIC(N, wavelengthFactor*S, 0, wavelengthFactor, epsilon, beta, gamma, 0);
         
     elseif S < 0
         
-        [ phi0, rho0 ] = solitonIC(N, 0, -2*S, wavelengthFactor, epsilon, beta, gamma, 0);
+        [ phi0, rho0 ] = solitonIC(N, 0, -wavelengthFactor*S, wavelengthFactor, epsilon, beta, gamma, 0);
         
     else
         

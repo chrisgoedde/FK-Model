@@ -36,7 +36,6 @@ function [ pathFormats, pathValues, runNumber ] = parseArguments(varargin)
 % '2D Spring' -> set transverse spring constant for 2D FK model
 
 runNumber = 1; % default run number for reading in data
-gamma2D = 1; % default 2D quadratic spring constant
 
 load(FKDefaults)
 
@@ -101,9 +100,9 @@ for i = 1:length(varargin)/2
             
             geometry = theValue;
             
-        case '2D Spring'
-            
-            gamma2D = theValue;
+%         case '2D Spring'
+%             
+%             gamma2D = theValue;
             
         case 'Push'
             
@@ -115,11 +114,11 @@ for i = 1:length(varargin)/2
             
         case 'Push Start'
             
-            tau0Push = theValue/1000;
+            tau0Push = theValue;
             
         case 'Push End'
             
-            taufPush = theValue/1000;
+            taufPush = theValue;
             
         case 'Pull'
             
@@ -131,11 +130,11 @@ for i = 1:length(varargin)/2
             
         case 'Pull Start'
             
-            tau0Pull = theValue/1000;
+            tau0Pull = theValue;
             
         case 'Pull End'
             
-            taufPull = theValue/1000;
+            taufPull = theValue;
             
         case 'Substrate Divide'
             
@@ -155,11 +154,11 @@ for i = 1:length(varargin)/2
             
         case 'Tug End'
             
-            taufTug = theValue/1000;
+            taufTug = theValue;
             
-        case 'Tug Spring'
-            
-            gammaTug = theValue;
+%         case 'Tug Spring'
+%             
+%             gammaTug = theValue;
             
         otherwise
             
@@ -168,6 +167,10 @@ for i = 1:length(varargin)/2
     end
     
 end
+
+% If we are not using a periodic tube, we set S to zero, so that N = N0.
+% If we are using a periodic tube, we must have a uniform substrate, and we
+% don't push or pull the (nonexistent) ends of the chain.
 
 if ~strcmp(geometry, 'ring')
     
@@ -178,15 +181,33 @@ else
     M = 0;
     Lambda = 1;
     Psi = 1;
+    dTug = 0;
+    nPull = 0;
+    nPush = 0;
     
 end
+
+% If we're not tugging on the end of the chain, set the duration and spring
+% force for the tug equal to zero. If we are tugging on the chain, set the
+% external push/pull to zero, and set the tugging spring constant to equal
+% the chain spring constant.
 
 if dTug == 0
     
     taufTug = 0;
-    gammaTug = 1;
+    gammaTug = 0;
+    
+else
+    
+    nPull = 0;
+    nPush = 0;
+    gammaTug = gamma;
     
 end
+
+% If we're not pushing on the left end of the chain, make sure the other
+% pushing parameters are zero. Likewise, if the pushing force is zero, make
+% sure the other pushing parameters are zero.
 
 if nPush == 0
     
@@ -202,6 +223,10 @@ elseif epsionPush == 0
     
 end
 
+% If we're not pulling on the right end of the chain, make sure the other
+% pulling parameters are zero. Likewise, if the pulling force is zero, make
+% sure the other pulling parameters are zero.
+
 if nPull == 0
     
     epsilonPull = 0;
@@ -215,6 +240,8 @@ elseif epsilonPull == 0
     taufPull = 0;
     
 end
+
+% If the chain is uniform, make sure all the parameters are consistent.
 
 if M == 0
     
@@ -248,22 +275,22 @@ else
     
 end
 
-pathFormats = { '%s', '%s', 'N0 = %d', 'S = %d', 'mu = %.1f', 'Theta = %.2f', ...
-    'beta = %.2e', 'substrate = (%d, %.2f, %.2f)', 'spring = (%.2f, %.2f)', ...
-    'epsilon = %.3f' 'push = (%d, %.3f, %.1f, %.1f)', ...
-    'pull = (%d, %.3f, %.1f, %.1f)', 'tug = (%.1f, %.1f, %.1f)', ...
+pathFormats = { '%s', 'Data', '%s', 'N0 = %d', 'S = %d', 'mu = %.1f', 'Theta = %.2f', ...
+    'beta = %.2e', 'substrate = (%d, %.2f, %.2f)', 'spring = (%.1f, %.2f)', ...
+    'epsilon = %.2e' 'push = (%d, %.1f, %.1f, %.1f)', ...
+    'pull = (%d, %.1f, %.1f, %.1f)', 'tug = (%.2f, %.1f, %.1f)', ...
     'tauf = %.1f', 'method = %s' };
-pathValues = { folderName, BC, N0, S, mu, Theta, beta, [ M, Lambda, Psi ], ...
+pathValues = { folderName, [], BC, N0, S, mu, Theta, beta, [ M, Lambda, Psi ], ...
     [ gamma, alpha/(2*pi) ], epsilon, [ nPush, epsionPush, tau0Push, taufPush ], ...
     [ nPull, epsilonPull, tau0Pull, taufPull ] [ dTug, taufTug, gammaTug ], ...
     tauf, methodName };
 
-if strcmp(methodName, '2D')
-    
-    pathFormats = [ pathFormats, 'gamma2D = %.2f' ];
-    pathValues = [ pathValues, gamma2D ];
-    
-end
+% if strcmp(methodName, '2D')
+%     
+%     pathFormats = [ pathFormats, 'gamma2D = %.2f' ];
+%     pathValues = [ pathValues, gamma2D ];
+%     
+% end
 
 showFKDefaults
 disp([ 'Run Number = ' num2str(runNumber, '%d') ])

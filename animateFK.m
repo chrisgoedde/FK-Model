@@ -1,6 +1,7 @@
 function animateFK(saveMovie, varargin)
 
 [ pathFormats, pathValues, runNumber ] = parseArguments(varargin{:});
+[ unit ] = setPhysicalConstants(varargin{:});
 
 load(FKDefaults, 'geometry')
 
@@ -15,13 +16,11 @@ end
 
 load(sprintf('%s/%sConstants.mat', readPathName, geometry));
 
-disp(nOut)
-
 [ tau, phi, ~, ~, ~ ] = loadDynamics(readPathName, geometry, runNumber);
 
 [ stretch, offset ] = findChainPosition(phi, wavelengthFactor, M, Lambda, alphaVector);
 
-theTitle = makeTitle(runNumber);
+theTitle = makeTitle(unit, runNumber);
 
 moleculeIndex = (1:N)';
 
@@ -55,7 +54,9 @@ xM = get(gca, 'xlim');
 yT = yM(1) + 0.9*(yM(2)-yM(1));
 xT = xM(1) + 0.7*(xM(2)-xM(1));
 
-handle = text(xT, yT, sprintf('time = %.1f', tau(1)));
+handle = text(xT, yT, sprintf('%s = %.1f%s', ...
+    unit.timeSymbol{unit.flag}, unit.timeFactor{unit.flag}*tau(1), ...
+    unit.timeName{unit.flag}));
 set(handle, 'fontsize', 14)
 
 title(theTitle)
@@ -66,7 +67,7 @@ if saveMovie
     
     frame = 1;
     
-    pathValues{1} = 'Movies';
+    pathValues{2} = 'Movies';
     moviePathName = makePath(pathFormats, pathValues, []);
 
     if ~exist(moviePathName, 'dir')
@@ -99,7 +100,9 @@ for i = 2:size(stretch, 2)
    
     set(p, 'ydata', offset(:, i)/(2*pi*wavelengthFactor));
 
-    set(handle, 'string', sprintf('time = %.1f', tau(i)))
+    set(handle, 'string', sprintf('%s = %.1f%s', ...
+        unit.timeSymbol{unit.flag}, unit.timeFactor{unit.flag}*tau(i), ...
+        unit.timeName{unit.flag}))
 
     if saveMovie
         
