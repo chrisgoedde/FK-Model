@@ -6,6 +6,12 @@ function name = FKDefaults %#ok<*NASGU>
 [ ~, systemName ] = system('hostname');
 systemName = strtok(systemName, '.');
 
+if ~isempty(strfind(systemName, 'dhcp')) || ~isempty(strfind(systemName, 'depaulsecure'))
+    
+    systemName = 'CGG-MacBook-Air';
+    
+end
+
 name = sprintf('FKDefaults-%s.mat', systemName);
 
 % Check to see if hostname-specific defaults file exists. If it doesn't,

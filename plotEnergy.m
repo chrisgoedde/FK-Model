@@ -20,13 +20,13 @@ load(sprintf('%s/%sConstants.mat', readPathName, geometry));
 
 [ tau, phi, rho, ~, ~ ] = loadDynamics(readPathName, geometry, runNumber);
 
-if unit.timeFactor{2} * tau(end) >= 1000
-    
-    unit.timeFactor{2} = unit.timeFactor{2}/1000;
-    unit.timeName = ' ns';
-    unit.timeLabel = '(ns)';
-    
-end
+% if unit.timeFactor{2} * tau(end) >= 1000
+%     
+%     unit.timeFactor{2} = unit.timeFactor{2}/1000;
+%     unit.timeName{2} = ' ns';
+%     unit.timeLabel{2} = '(ns)';
+%     
+% end
 
 [ KE, PE ] = findChainEnergy(phi, rho, alphaVector, deltaVector, gammaVector);
 
