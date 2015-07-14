@@ -1,10 +1,7 @@
 function animateSolitonStatistics(saveMovie, varargin)
 
-alpha = [];
-gamma = [];
-beta = [];
-
 [ pathFormats, pathValues, ~ ] = parseArguments(varargin{:});
+[ unit ] = setPhysicalConstants(varargin{:});
 
 load(FKDefaults, 'geometry')
 
@@ -25,7 +22,7 @@ while exist(sprintf('%s/%sDynamics-%d.mat', readPathName, geometry, runNumber), 
     
     [ tau, phi, ~, ~, ~ ] = loadDynamics(readPathName, geometry, runNumber);
     
-    [ ~, offset ] = findChainPosition(phi, wavelengthFactor, alpha);
+    [ ~, offset ] = findChainPosition(phi, wavelengthFactor, M, Lambda, alphaVector);
     
     [ solitonNumber(runNumber,:), solitonPosition(runNumber,:) ] = findSolitons(offset, wavelengthFactor); %#ok<AGROW>
     
@@ -36,7 +33,7 @@ end
 numTimes = size(phi, 2);
 numRuns = runNumber - 1;
 
-theTitle = makeTitle(alpha, beta, gamma, kB*bathTemp/V0, epsilon0Pull, epsilon0Push, numRuns);
+theTitle = makeTitle(unit, runNumber);
 
 [ sN, sP ] = meshgrid(min(min(solitonNumber)):max(max(solitonNumber)), ...
     min(min(solitonPosition)):0.5:max(max(solitonPosition)));
@@ -60,11 +57,11 @@ hold on
 grid on
 box on
 
-% set(gca, 'xlim', [ min(min(solitonNumber))-1 max(max(solitonNumber))+1 ])
-% set(gca, 'ylim', [ min(min(solitonPosition))-1 max(max(solitonPosition))+1 ])
+set(gca, 'xlim', [ min(min(solitonNumber))-1 max(max(solitonNumber))+1 ])
+set(gca, 'ylim', [ min(min(solitonPosition))-1 max(max(solitonPosition))+1 ])
 
-set(gca, 'xlim', [ -1 7 ])
-set(gca, 'ylim', [ -10 10 ])
+% set(gca, 'xlim', [ -1 7 ])
+% set(gca, 'ylim', [ -10 10 ])
 
 set(gca, 'fontsize', 14)
 xlabel('# of solitons')
@@ -77,7 +74,9 @@ xM = get(gca, 'xlim');
 yT = yM(1) + 0.9*(yM(2)-yM(1));
 xT = xM(1) + 0.7*(xM(2)-xM(1));
 
-handle = text(xT, yT, sprintf('time = %.1f ps', t0*tau(1)*1e12));
+handle = text(xT, yT, sprintf('%s = %.1f%s', ...
+    unit.timeSymbol{unit.flag}, unit.timeFactor{unit.flag}*tau(1), ...
+    unit.timeName{unit.flag}));
 set(handle, 'fontsize', 14)
 
 map = colormap(lines);
@@ -112,7 +111,7 @@ if saveMovie
     
     frame = 1;
     
-    pathValues{1} = 'Movies';
+    pathFormats{2} = 'Movies';
     moviePathName = makePath(pathFormats, pathValues, []);
 
     if ~exist(moviePathName, 'dir')
@@ -163,7 +162,9 @@ for n = 2:numTimes
         
     end
 
-    set(handle, 'string', sprintf('time = %.1f ps', t0*tau(n)*1e12))
+    set(handle, 'string', sprintf('%s = %.1f%s', ...
+        unit.timeSymbol{unit.flag}, unit.timeFactor{unit.flag}*tau(n), ...
+        unit.timeName{unit.flag}))
     
     if saveMovie
         

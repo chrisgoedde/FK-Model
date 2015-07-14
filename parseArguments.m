@@ -39,7 +39,8 @@ runNumber = 1; % default run number for reading in data
 
 load(FKDefaults)
 
-fprintf('Parsing %d arguments.\n', length(varargin)/2)
+plural = { 's', '' };
+fprintf('Parsing %d argument%s.\n', length(varargin)/2, plural{(length(varargin)/2 == 1) + 1})
 
 for i = 1:length(varargin)/2
     

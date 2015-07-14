@@ -67,7 +67,7 @@ if saveMovie
     
     frame = 1;
     
-    pathValues{2} = 'Movies';
+    pathFormats{2} = 'Movies';
     moviePathName = makePath(pathFormats, pathValues, []);
 
     if ~exist(moviePathName, 'dir')
@@ -76,7 +76,7 @@ if saveMovie
     
     end
 
-    gifFileName = sprintf('%s/%s.gif', moviePathName, geometry);
+    gifFileName = sprintf('%s/%s-%d.gif', moviePathName, geometry, runNumber);
     addFrameToGIF(frame, fH, gifFileName)
     
     mp4FileName = sprintf('%s/%s.mp4',moviePathName, geometry);

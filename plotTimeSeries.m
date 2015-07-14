@@ -59,7 +59,7 @@ plot(time, fF * sum(dampingForce), 'r', 'linewidth', 2)
 plot(time, fF * sum(drivingForce), 'k', 'linewidth', 2)
 
 set(gca, 'fontsize', fontSize)
-xlabel(sprintf('time %s', unit.timeLabel{unit.flag}))
+xlabel(sprintf('Time %s', unit.timeLabel{unit.flag}))
 ylabel(sprintf('Force %s', unit.forceLabel{unit.flag}))
 legend('Substrate', 'Spring', 'Damping', 'Driving', 'location', 'best')
 

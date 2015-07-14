@@ -1,10 +1,7 @@
 function plotSolitonStatistics(varargin)
 
-alpha = [];
-gamma = [];
-beta = [];
-
 [ pathFormats, pathValues, ~ ] = parseArguments(varargin{:});
+[ unit ] = setPhysicalConstants(varargin{:});
 
 load(FKDefaults, 'geometry')
 
@@ -23,32 +20,42 @@ runNumber = 1;
 
 while exist(sprintf('%s/%sDynamics-%d.mat', readPathName, geometry, runNumber), 'file')
 
-    [ ~, phi, ~, ~, ~ ] = loadDynamics(readPathName, geometry, runNumber);
+    [ tau, phi, ~, ~, ~ ] = loadDynamics(readPathName, geometry, runNumber);
     
-    [ ~, offset ] = findChainPosition(phi, wavelengthFactor, alpha);
+    [ ~, offset ] = findChainPosition(phi, wavelengthFactor, M, Lambda, alphaVector);
 
-    [ tNumber, pNumber ] = findSolitons(offset, wavelengthFactor);
-    
-    solitonNumber(runNumber) = tNumber(end); %#ok<AGROW>
-    solitonPosition(runNumber) = pNumber(end); %#ok<AGROW>
-    
+    [ solitonNumber(runNumber, :), solitonPosition(runNumber, :) ] = findSolitons(offset, wavelengthFactor); %#ok<AGROW>
+        
     runNumber = runNumber + 1;
     
 end
 
+if unit.timeFactor{2} * tau(end) >= 1000
+    
+    unit.timeFactor{2} = unit.timeFactor{2}/1000;
+    unit.timeName = ' ns';
+    unit.timeLabel = '(ns)';
+    
+end
+
+time = unit.timeFactor{unit.flag} * tau;
+
 runNumber = runNumber - 1;
 
-theTitle = makeTitle(alpha, beta, gamma, kB*bathTemp/V0, epsilon0Pull, epsilon0Push, runNumber);
+theTitle = makeTitle(unit, runNumber);
 
-[ sN, sP ] = meshgrid(min(solitonNumber):max(solitonNumber), ...
-    min(solitonPosition):0.5:max(solitonPosition));
+finalSN = solitonNumber(:, end);
+finalSP = solitonPosition(:, end);
+
+[ sN, sP ] = meshgrid(min(finalSN):max(finalSN), min(finalSP):0.5:max(finalSP));
 
 numRuns = zeros(size(sN));
+fractionRuns = zeros(size(sN));
 
-for i = 1:length(solitonNumber)
+for i = 1:length(finalSN)
     
-    sNIndex = solitonNumber(i) - min(solitonNumber) + 1;
-    sPIndex = 2*(solitonPosition(i) - min(solitonPosition)) + 1;
+    sNIndex = finalSN(i) - min(finalSN) + 1;
+    sPIndex = 2*(finalSP(i) - min(finalSP)) + 1;
     numRuns(sPIndex, sNIndex) = numRuns(sPIndex, sNIndex) + 1;
     
 end
@@ -58,8 +65,8 @@ hold on
 grid on
 box on
 
-set(gca, 'xlim', [ min(solitonNumber)-1 max(solitonNumber)+1 ])
-set(gca, 'ylim', [ min(solitonPosition)-1 max(solitonPosition)+1 ])
+set(gca, 'xlim', [ min(finalSN)-1 max(finalSN)+1 ])
+set(gca, 'ylim', [ min(finalSP)-1 max(finalSP)+1 ])
 set(gca, 'fontsize', 14)
 xlabel('# of solitons')
 ylabel('chain offset')
@@ -73,7 +80,8 @@ for j = 1:size(sN, 2)
         
         if numRuns(i, j) ~= 0
             
-            mSize = 10*sqrt(numRuns(i,j)*100/runNumber);
+            fractionRuns(i,j) = numRuns(i,j)*100/runNumber;
+            mSize = 10*sqrt(fractionRuns(i,j));
             
             plot(sN(i,j), sP(i,j), 's', 'markeredgecolor', map(1, :), ...
                 'markerfacecolor', map(1, :), ...
@@ -92,5 +100,67 @@ for j = 1:size(sN, 2)
     end
     
 end
+
+figure;
+hold on
+grid on
+box on
+
+set(gca, 'fontsize', 14)
+xlabel(sprintf('Time %s', unit.timeLabel{unit.flag}))
+ylabel('Probability')
+title(theTitle)
+
+[ sN, sP ] = meshgrid(min(min(solitonNumber)):max(max(solitonNumber)), ...
+    min(min(solitonPosition)):0.5:max(max(solitonPosition)));
+
+numTimes = size(phi, 2);
+solitonStats = zeros([ size(sN) numTimes ]);
+
+for j = 1:numTimes
+    
+    for i = 1:runNumber
+        
+        sNIndex = solitonNumber(i, j) - min(min(solitonNumber)) + 1;
+        sPIndex = 2*(solitonPosition(i, j) - min(min(solitonPosition))) + 1;
+        solitonStats(sPIndex, sNIndex, j) = solitonStats(sPIndex, sNIndex, j) + 1;
+%         if solitonNumber(i, j) > 1
+%             fprintf('Found 2 anti-kinks at p = 0 in run %d at time %d\n', i, tau(j))
+%         end
+        
+    end
+    
+end
+
+legendArray = {};
+plural = { 's', '' };
+solitonType = { 'kink', 'soliton', 'anti-kink' };
+
+for j = 1:size(sN, 2)
+    
+    for i = 1:size(sP, 1)
+        
+        if sum(solitonStats(i, j, :)) ~= 0
+            
+            plot(time, squeeze(solitonStats(i, j, :)/runNumber), 'linewidth', 2);
+            
+            solitonIndex = (sN(i,j) > 0) - (sN(i,j) < 0) + 2;
+            legendArray = [ legendArray, sprintf('%d %s%s, position %.1f', ...
+                abs(sN(i, j)), solitonType{solitonIndex}, plural{(abs(sN(i,j)) == 1) + 1}, sP(i, j)) ]; %#ok<AGROW>
+            
+        end
+            
+    end
+    
+end
+
+legend(legendArray, 'location', 'northeast')
+
+pathFormats{2} = 'Pictures';
+plotPathName = makePath(pathFormats, pathValues, []);
+pngFileName = sprintf('%sSolitonStatistics', geometry);
+
+setPrintSize(8, 6, true)
+makePrint(plotPathName, pngFileName, 'png', true)
 
 end
