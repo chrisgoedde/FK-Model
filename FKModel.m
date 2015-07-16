@@ -40,7 +40,7 @@ nTime = round(tauf/dtau);
 if nTime < 1000
     
     nTime = 1000;
-    dtau = tf/nTime;
+    dtau = tauf/nTime;
     nOut = nTime;
     
 else

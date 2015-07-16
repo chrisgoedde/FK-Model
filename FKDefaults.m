@@ -39,7 +39,8 @@ if ~exist(name, 'file')
         gamma = 15; % default dimensionless spring constant
         alpha = 2*pi; % default dimensionless spring rest length
         methodName = 'ode45'; % default method of integration
-        folderName = 'Results'; % default save folder for data
+        folderName = 'Test'; % default save folder for data
+        folderType = 'Data'; % default type to save
         geometry = 'ring'; % default geometry (alternate: 'chain')
         nPush = 0; % default number of molecules on left to be pushed
         epsilonPush = 0; % default dimensionless pushing force

@@ -35,10 +35,10 @@ fF = unit.forceFactor{unit.flag};
 vF = unit.velocityFactor{unit.flag};
 EF = unit.energyFactor{unit.flag};
 
+initSubstrateForce(M, Lambda, Psi);
 [ KE, PE ] = findChainEnergy(phi, rho, alphaVector, deltaVector, gammaVector);
 initDrivingForce(epsilonVector, epsilonPushVector, tau0Push, taufPush, ...
         epsilonPullVector, tau0Pull, taufPull, phiTug, taufTug, gammaTug, startTug);
-initSubstrateForce(M, Lambda, Psi);
 [ springForceLeft, springForceRight, dampingForce, drivingForce, substrateForce ] = findChainForces(tau, phi, rho, alphaVector, gammaVector, beta);
 
 theTitle = makeTitle(unit, runNumber);
