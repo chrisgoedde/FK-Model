@@ -10,20 +10,19 @@ eV = repmat(eV, [ 1 numTimes ]);
 
 eVTug = zeros(N, numTimes);
 
-% if startTug > 0
+if taufTug ~= 0
     
     endPoint = [ startTug + phiTug*tau/taufTug; startTug + phiTug*ones(size(tau)) ];
     endPoint = min(endPoint);
     
-    eVTug(N, :) = -gammaTug * (phi(N, :)-endPoint);
+else
     
-% end
+    endPoint = startTug + phiTug*ones(size(tau));
+    
+end
 
-% if taufTug ~= 0
-%     disp(gammaTug), disp(startTug), disp(phiTug), disp(phi(N)), disp(endPoint)
-%     disp(eVTug(N,:)), pause
-% end
-    
+eVTug(N, :) = -gammaTug * (phi(N, :) - endPoint);
+
 tauMatrix = repmat(tau, [ N 1 ]);
 
 ePushV = repmat(ePushV, [ 1 numTimes ]);
