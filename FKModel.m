@@ -1,224 +1,103 @@
 function FKModel(varargin)
-% FKModel(...)
-% All the arguments are parsed in the function parseArguments
-
-tStart = tic;
-
-geometry = [];
-  
-% Initialize the input parameters.
-
-[ pathFormats, pathValues, runNumber ] = parseArguments(varargin{:});
-
-load(FKDefaults, 'N0', 'S', 'epsilon', 'Theta', 'tauf', ...
-    'beta', 'gamma', 'alpha', ...
-    'methodName', 'geometry', 'folderName', ...
-    'nPush', 'epsilonPush', 'tau0Push', 'taufPush', ...
-    'nPull', 'epsilonPull', 'tau0Pull', 'taufPull', 'M', 'Lambda', 'Psi', ...
-    'dTug', 'taufTug', 'gammaTug')
-
-if tau0Pull > taufPull
+    % FKModel(...)
+    % All the arguments are parsed in the function parseArguments
     
-    disp('Pull end time must be later than pull start time.')
-    return
+    tStart = tic;
     
-end
-
-if tau0Push > taufPush
+    % geometry = [];
     
-    disp('Push end time must be later than push start time.')
-    return
+    % Initialize the input parameters.
     
-end
-
-% Time step information
-
-N = N0+S;
-dtau = 0.1; % Step size for the thermal noise
-nTime = round(tauf/dtau);
-
-if nTime < 1000
+    [ pathFormats, pathValues, runNumber ] = parseArguments(varargin{:});
     
-    nTime = 1000;
-    dtau = tauf/nTime;
-    nOut = nTime;
+    load(FKDefaults, 'N0', 'S', 'Theta', 'tauf', 'beta', 'methodName', 'geometry')
     
-else
-
-    nOut = trimOutput(nTime);
-
-end
-
-muVector = ones(N, 1); % vector of dimensionless molecule masses
-
-alphaVector = alpha * ones(N, 1); % vector of dimensionless water spacing
-wavelengthFactor = round(alpha/(2*pi));
-
-% Create the vector of spring constants ... if the geometry is a chain
-% rather than a ring, make the first spring constant zero ... this is the
-% spring constant that lies to the left of the first mass, connecting it to
-% the last mass in the ring geometry.
-
-if ~strcmp(geometry, 'ring')
-
-    gammaVector = gamma * [ 0 ; ones(N-1, 1) ];
-    alphaVector(1) = 0;
-    sMin = substrateMinima(N, M, Lambda);
-    startTug = sMin(end);
-    clear sMin
-
-else
+    % Time step information
     
-    gammaVector = gamma * ones(N, 1);
-    alphaVector(1) = alphaVector(1) - 2*pi * N0;
-    startTug = 0;
-
-end
-
-
-deltaVector = 1./muVector;
-
-epsilonVector = epsilon*ones(N, 1);
-epsilonPushVector = epsilonPush*[ ones(nPush, 1); zeros(N-nPush, 1) ];
-epsilonPullVector = epsilonPull*[ zeros(N-nPull, 1) ; ones(nPull, 1) ];
-
-phiTug = Lambda*2*pi*dTug;
-
-Omega = sqrt(4*beta*Theta*dtau);
-
-% Calculate the initial condition
-
-if strcmp(geometry, 'chain')
+    N = N0+S;
+    dtau = 0.1; % Step size for the thermal noise
+    nTime = round(tauf/dtau);
     
-    phi0 = alpha * (0:(N-1))';
-    rho0 = zeros(N, 1);
-    
-elseif strcmp(geometry(1), 's')
-    
-    stretch = str2double(geometry(2:end));
-    if stretch ~= 0 || M == 0
+    if nTime < 1000
         
-        [ phi0, rho0 ] = solitonIC(N, 0, stretch, wavelengthFactor, epsilon, beta, gamma, 0);
+        nTime = 1000;
+        dtau = tauf/nTime;
+        nOut = nTime;
         
     else
         
-        phi0 = wavelengthFactor * substrateMinima(N, M, Lambda);
-        rho0 = zeros(N, 1);
-        
-    end
-
-elseif strcmp(geometry(1), 'e')
-    
-    stretch = str2double(geometry(2:end)); 
-    if stretch ~= 0 || M == 0
-        
-        [ phi0, rho0 ] = solitonIC(N, 0, stretch, wavelengthFactor, epsilon, beta, gamma, 0);
-        
-    else
-        
-        phi0 = wavelengthFactor * substrateMinima(N, M, Lambda);
-        rho0 = zeros(N, 1);
+        nOut = trimOutput(nTime);
         
     end
     
-    fprintf('Equilibrating initial condition ...\n')
+    Omega = sqrt(4*beta*Theta*dtau);
     
-    initDrivingForce(0*epsilonVector, 0*epsilonPushVector, tau0Push, taufPush, ...
-        0*epsilonPullVector, tau0Pull, taufPull, 0, taufTug, gammaTug, startTug);
-    initSubstrateForce(M, Lambda, Psi);
+    % Calculate the initial condition
     
-    [ ~, phi, rho, ~, ~ ] = solveFK(500, 500, 500, phi0, rho0, ...
-        deltaVector, gammaVector, alphaVector, 0.01, Omega, @ode45);
+    [ phi0, rho0 ] = makeIC(N, geometry, beta, Omega);
     
-    phi0 = phi(:, end);
-    rho0 = rho(:, end);
-
-    fprintf('Completed initial condition.\n')
+    % Annoyingly, while the initial conditions must be column vectors, ode45
+    % makes the output variables row vectors (with time being the column
+    % vector), so we'll transpose the output for consistency. As a result, the
+    % molecule's index is the first element of phi, rho, stretch, and energy,
+    % while the time index is the second element.
     
-else
-    
-    if S > 0
+    if ~strcmp(methodName, '2D')
         
-        [ phi0, rho0 ] = solitonIC(N, wavelengthFactor*S, 0, wavelengthFactor, epsilon, beta, gamma, 0);
+        if strcmp(methodName, 'ode23s')
+            
+            method = @ode23s;
+            
+        elseif strcmp(methodName, 'ode45')
+            
+            method = @ode45;
+            
+        elseif strcmp(methodName, 'myode')
+            
+            method = @myode;
+            
+        else
+            
+            fprintf('%s is not a valid method name\n', methodName);
+            return
+            
+        end
         
-    elseif S < 0
-        
-        [ phi0, rho0 ] = solitonIC(N, 0, -wavelengthFactor*S, wavelengthFactor, epsilon, beta, gamma, 0);
+        [ tau, phi, rho, phiAvg, rhoAvg ] = solveFK(tauf, nTime, nOut, phi0, ...
+            rho0, beta, Omega, method);
         
     else
         
-        [ phi0, rho0 ] = solitonIC(N, 1, 1, wavelengthFactor, epsilon, beta, gamma, 0);
-        
-    end
-    
-end
-
-% Annoyingly, while the initial conditions must be column vectors, ode45
-% makes the output variables row vectors (with time being the column
-% vector), so we'll transpose the output for consistency. As a result, the
-% molecule's index is the first element of phi, rho, stretch, and energy,
-% while the time index is the second element.
-
-if ~strcmp(methodName, '2D')
-    
-    if strcmp(methodName, 'ode23s')
-        
-        method = @ode23s;
-        
-    elseif strcmp(methodName, 'ode45')
-        
-        method = @ode45;
-        
-    elseif strcmp(methodName, 'myode')
-        
-        method = @myode;
-        
-    else
-        
-        fprintf('%s is not a valid method name\n', methodName);
+        disp('2D model not currently implemented')
         return
         
+        %     Gamma = 1;
+        %
+        %     [ tau, phi, rho, phiAvg, rhoAvg ] = solve2DFK(tauf, nTime, nOut, phi0, ...
+        %         rho0, delta, gamma, alpha, epsilon, epsilonPush, tau0Push, taufPush, ...
+        %         epsilonPull, tau0Pull, taufPull, beta, etaPrime, Omega, ...
+        %         sqrt(mAvg*kB*bathTemp)/p0, Gamma, @ode45);
+        
     end
     
-    initDrivingForce(epsilonVector, epsilonPushVector, tau0Push, taufPush, ...
-        epsilonPullVector, tau0Pull, taufPull, phiTug, taufTug, gammaTug, startTug);
-    initSubstrateForce(M, Lambda, Psi);
+    writePathName = makePath(pathFormats, pathValues, []);
     
-    [ tau, phi, rho, phiAvg, rhoAvg ] = solveFK(tauf, nTime, nOut, phi0, ...
-        rho0, deltaVector, gammaVector, alphaVector, beta, Omega, method);
+    saveDynamics(writePathName, geometry, runNumber, tau, phi, rho, phiAvg, rhoAvg);
     
-else
+    clear tau rho phi rhoAvg phiAvg rho0 phi0 ans method varargin runNumber
     
-    disp('2D model not currently implemented')
-    return
+    save(sprintf('%s/%sConstants', writePathName, geometry))
     
-%     Gamma = 1;
-%     
-%     [ tau, phi, rho, phiAvg, rhoAvg ] = solve2DFK(tauf, nTime, nOut, phi0, ...
-%         rho0, delta, gamma, alpha, epsilon, epsilonPush, tau0Push, taufPush, ...
-%         epsilonPull, tau0Pull, taufPull, beta, etaPrime, Omega, ...
-%         sqrt(mAvg*kB*bathTemp)/p0, Gamma, @ode45);
+    elapsed = toc(tStart)/60;
     
-end
-
-writePathName = makePath(pathFormats, pathValues, []);
-
-saveDynamics(writePathName, geometry, runNumber, tau, phi, rho, phiAvg, rhoAvg);
-
-clear tau rho phi rhoAvg phiAvg rho0 phi0 ans method varargin runNumber
-
-save(sprintf('%s/%sConstants', writePathName, geometry))
-
-elapsed = toc(tStart)/60;
-
-if elapsed > 3
-    fprintf('Elapsed time using %s: %d minutes.\n', methodName, round(elapsed))
-elseif elapsed > 1
-    fprintf('Elapsed time using %s: %.1f minutes.\n', methodName, round(elapsed, 1))
-else
-    fprintf('Elapsed time using %s: %d seconds.\n', methodName, round(elapsed*60))
-end
-
-% beep
-
+    if elapsed > 3
+        fprintf('Elapsed time using %s: %d minutes.\n', methodName, round(elapsed))
+    elseif elapsed > 1
+        fprintf('Elapsed time using %s: %.1f minutes.\n', methodName, round(elapsed, 1))
+    else
+        fprintf('Elapsed time using %s: %d seconds.\n', methodName, round(elapsed*60))
+    end
+    
+    % beep
+    
 end

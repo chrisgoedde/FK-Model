@@ -1,17 +1,19 @@
-function [ MOut, LambdaOut, PsiOut ] = initSubstrateForce(varargin)
-
-persistent M Lambda Psi
-
-if ~isempty(varargin)
+function [ MOut, LambdaOut, PsiOut ] = initSubstrateForce(initFlag)
     
-    M = varargin{1};
-    Lambda = varargin{2};
-    Psi = varargin{3};
+    persistent MSave LambdaSave PsiSave
     
-end
-
-MOut = M;
-LambdaOut = Lambda;
-PsiOut = Psi;
-
+    if initFlag
+        
+        load(FKDefaults, 'M', 'Lambda', 'Psi')
+        
+        MSave = M;
+        LambdaSave = Lambda;
+        PsiSave = Psi;
+        
+    end
+    
+    MOut = MSave;
+    LambdaOut = LambdaSave;
+    PsiOut = PsiSave;
+    
 end

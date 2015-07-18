@@ -1,35 +1,53 @@
 function [ eVOut, ePushVOut, tau0PushOut, taufPushOut, ePullVOut, ...
-    tau0PullOut, taufPullOut, dTugOut, tfTugOut, gammaTugOut, startTugOut ] = initDrivingForce(varargin)
-
-persistent eV ePushV tau0Push taufPush ePullV tau0Pull taufPull ...
-    dTug tfTug gammaTug startTug
-
-if ~isempty(varargin)
+        tau0PullOut, taufPullOut, phiTugOut, tfTugOut, gammaTugOut, startTugOut ] = initDrivingForce(initFlag)
     
-    eV = varargin{1};
-    ePushV = varargin{2};
-    tau0Push = varargin{3};
-    taufPush = varargin{4};
-    ePullV = varargin{5};
-    tau0Pull = varargin{6};
-    taufPull = varargin{7};
-    dTug = varargin{8};
-    tfTug = varargin{9};
-    gammaTug = varargin{10};
-    startTug = varargin{11};
+    persistent eV ePushV t0Push tfPush ePullV t0Pull tfPull ...
+        phiTug tfTug gTug startTug
     
-end
-
-eVOut = eV;
-ePushVOut = ePushV;
-tau0PushOut = tau0Push;
-taufPushOut = taufPush;
-ePullVOut = ePullV;
-tau0PullOut = tau0Pull;
-taufPullOut = taufPull;
-dTugOut = dTug;
-tfTugOut = tfTug;
-gammaTugOut = gammaTug;
-startTugOut = startTug;
-
+    if initFlag
+        
+        load(FKDefaults, 'epsilon', 'nPush', 'epsilonPush', 'tau0Push', 'taufPush', ...
+            'nPull', 'epsilonPull', 'tau0Pull', 'taufPull', ...
+            'dTug', 'taufTug', 'gammaTug', ...
+            'geometry', 'N0', 'S', 'M', 'Lambda')
+        
+        N = N0 + S;
+        
+        if ~strcmp(geometry, 'ring')
+            
+            sMin = substrateMinima(N, M, Lambda);
+            startTug = sMin(end);
+            
+        else
+            
+            startTug = 0;
+            
+        end
+        
+        eV = epsilon*ones(N, 1);
+        ePushV = epsilonPush*[ ones(nPush, 1); zeros(N-nPush, 1) ];
+        ePullV = epsilonPull*[ zeros(N-nPull, 1) ; ones(nPull, 1) ];
+        
+        t0Push = tau0Push;
+        tfPush = taufPush;
+        t0Pull = tau0Pull;
+        tfPull = taufPull;
+        phiTug = Lambda*2*pi*dTug;
+        tfTug = taufTug;
+        gTug = gammaTug;
+        
+    end
+    
+    eVOut = eV;
+    ePushVOut = ePushV;
+    tau0PushOut = t0Push;
+    taufPushOut = tfPush;
+    ePullVOut = ePullV;
+    tau0PullOut = t0Pull;
+    taufPullOut = tfPull;
+    phiTugOut = phiTug;
+    tfTugOut = tfTug;
+    gammaTugOut = gTug;
+    startTugOut = startTug;
+    
 end
