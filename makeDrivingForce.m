@@ -1,16 +1,14 @@
-function externalForce = makeDrivingForce(tau, phi)
+function externalForce = makeDrivingForce(tau, phi, drivingFlag)
     
     [ eV, ePushV, tau0Push, taufPush, ePullV, tau0Pull, taufPull, ...
-        phiTug, taufTug, gammaTug, startTug ] = initDrivingForce();
+        phiTug, taufTug, gammaTug, startTug ] = initDriving(false);
     
     numTimes = length(tau);
     N = length(eV);
     
-    eV = repmat(eV, [ 1 numTimes ]);
-    
     eVTug = zeros(N, numTimes);
     
-    if taufTug ~= 0
+    if taufTug ~= 0  && drivingFlag
         
         endPoint = [ startTug + phiTug*tau/taufTug; startTug + phiTug*ones(size(tau)) ];
         endPoint = min(endPoint);
@@ -23,13 +21,23 @@ function externalForce = makeDrivingForce(tau, phi)
     
     eVTug(N, :) = -gammaTug * (phi(N, :) - endPoint);
     
-    tauMatrix = repmat(tau, [ N 1 ]);
+    if drivingFlag
+        
+        eV = repmat(eV, [ 1 numTimes ]);
+        
+        tauMatrix = repmat(tau, [ N 1 ]);
+        
+        ePushV = repmat(ePushV, [ 1 numTimes ]);
+        ePushV = ePushV .* (tauMatrix >= tau0Push) .* (tauMatrix <= taufPush);
+        ePullV = repmat(ePullV, [ 1 numTimes ]);
+        ePullV = ePullV .* (tauMatrix >= tau0Pull) .* (tauMatrix <= taufPull);
+        
+        externalForce = eV + ePushV + ePullV + eVTug;
     
-    ePushV = repmat(ePushV, [ 1 numTimes ]);
-    ePushV = ePushV .* (tauMatrix >= tau0Push) .* (tauMatrix <= taufPush);
-    ePullV = repmat(ePullV, [ 1 numTimes ]);
-    ePullV = ePullV .* (tauMatrix >= tau0Pull) .* (tauMatrix <= taufPull);
-    
-    externalForce = eV + ePushV + ePullV + eVTug;
+    else
+        
+        externalForce = eVTug;
+        
+    end
     
 end

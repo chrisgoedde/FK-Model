@@ -1,5 +1,5 @@
 function [ eVOut, ePushVOut, tau0PushOut, taufPushOut, ePullVOut, ...
-        tau0PullOut, taufPullOut, phiTugOut, tfTugOut, gammaTugOut, startTugOut ] = initDrivingForce(initFlag)
+        tau0PullOut, taufPullOut, phiTugOut, tfTugOut, gammaTugOut, startTugOut ] = initDriving(initFlag)
     
     persistent eV ePushV t0Push tfPush ePullV t0Pull tfPull ...
         phiTug tfTug gTug startTug

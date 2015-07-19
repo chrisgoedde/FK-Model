@@ -1,4 +1,4 @@
-function [ aVOut, gVOut ] = initSpringForce(initFlag)
+function [ aVOut, gVOut ] = initSprings(initFlag)
     
     persistent alphaVector gammaVector
     

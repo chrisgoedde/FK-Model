@@ -1,7 +1,6 @@
-function [ phi0, rho0 ] = makeIC(N, geometry, beta, Omega)
+function [ phi0, rho0 ] = makeIC(N, geometry)
     
-    load(FKDefaults, 'alpha', 'gamma', 'M', 'Lambda', 'epsilon')
-    wavelengthFactor = round(alpha/(2*pi));
+    load(FKDefaults, 'alpha', 'gamma', 'M', 'Lambda', 'epsilon', 'beta', 'wF')
 
     if strcmp(geometry, 'chain')
         
@@ -13,11 +12,11 @@ function [ phi0, rho0 ] = makeIC(N, geometry, beta, Omega)
         stretch = str2double(geometry(2:end));
         if stretch ~= 0 || M == 0
             
-            [ phi0, rho0 ] = solitonIC(N, 0, stretch, wavelengthFactor, epsilon, beta, gamma, 0);
+            [ phi0, rho0 ] = solitonIC(N, 0, stretch, wF, epsilon, beta, gamma, 0);
             
         else
             
-            phi0 = wavelengthFactor * substrateMinima(N, M, Lambda);
+            phi0 = wF * substrateMinima(N, M, Lambda);
             rho0 = zeros(N, 1);
             
         end
@@ -27,19 +26,18 @@ function [ phi0, rho0 ] = makeIC(N, geometry, beta, Omega)
         stretch = str2double(geometry(2:end));
         if stretch ~= 0 || M == 0
             
-            [ phi0, rho0 ] = solitonIC(N, 0, stretch, wavelengthFactor, epsilon, beta, gamma, 0);
+            [ phi0, rho0 ] = solitonIC(N, 0, stretch, wF, epsilon, beta, gamma, 0);
             
         else
             
-            phi0 = wavelengthFactor * substrateMinima(N, M, Lambda);
+            phi0 = wF * substrateMinima(N, M, Lambda);
             rho0 = zeros(N, 1);
             
         end
         
         fprintf('Equilibrating initial condition ...\n')
         
-        [ ~, phi, rho, ~, ~ ] = solveFK(500, 500, 500, phi0, rho0, ...
-            0.01, Omega, @ode45);
+        [ ~, phi, rho ] = solveFK(500, 1, 100, phi0, rho0, 0.01, false, @ode45);
         
         phi0 = phi(:, end);
         rho0 = rho(:, end);
@@ -50,15 +48,15 @@ function [ phi0, rho0 ] = makeIC(N, geometry, beta, Omega)
         
         if S > 0
             
-            [ phi0, rho0 ] = solitonIC(N, wavelengthFactor*S, 0, wavelengthFactor, epsilon, beta, gamma, 0);
+            [ phi0, rho0 ] = solitonIC(N, wF*S, 0, wF, epsilon, beta, gamma, 0);
             
         elseif S < 0
             
-            [ phi0, rho0 ] = solitonIC(N, 0, -wavelengthFactor*S, wavelengthFactor, epsilon, beta, gamma, 0);
+            [ phi0, rho0 ] = solitonIC(N, 0, -wF*S, wF, epsilon, beta, gamma, 0);
             
         else
             
-            [ phi0, rho0 ] = solitonIC(N, 1, 1, wavelengthFactor, epsilon, beta, gamma, 0);
+            [ phi0, rho0 ] = solitonIC(N, 1, 1, wF, epsilon, beta, gamma, 0);
             
         end
         

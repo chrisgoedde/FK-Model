@@ -1,4 +1,4 @@
-function [ MOut, LambdaOut, PsiOut ] = initSubstrateForce(initFlag)
+function [ MOut, LambdaOut, PsiOut ] = initSubstrate(initFlag)
     
     persistent MSave LambdaSave PsiSave
     

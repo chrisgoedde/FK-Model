@@ -1,17 +1,17 @@
-function [ tau, phi, rho, phiAvg, rhoAvg ] = loadDynamics(thePath, geometry, dataSet) %#ok<STOUT>
-
-if dataSet == 0
+function [ tau, phi, rho ] = loadDynamics(thePath, geometry, dataSet) %#ok<STOUT>
     
-    loadfileName = sprintf('%s/%sDynamics.mat', thePath, geometry);
+    if dataSet == 0
+        
+        loadfileName = sprintf('%s/%sDynamics.mat', thePath, geometry);
+        
+    else
+        
+        loadfileName = sprintf('%s/%sDynamics-%d.mat', thePath, geometry, dataSet);
+        
+    end
     
-else
+    fprintf('Loading %s.\n', loadfileName)
     
-    loadfileName = sprintf('%s/%sDynamics-%d.mat', thePath, geometry, dataSet);
-
-end
-
-fprintf('Loading %s.\n', loadfileName)
-
-load(loadfileName)
-
+    load(loadfileName)
+    
 end

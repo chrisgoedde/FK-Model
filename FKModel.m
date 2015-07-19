@@ -16,25 +16,26 @@ function FKModel(varargin)
     
     N = N0+S;
     dtau = 0.1; % Step size for the thermal noise
-    nTime = round(tauf/dtau);
     
-    if nTime < 1000
-        
-        nTime = 1000;
-        dtau = tauf/nTime;
-        nOut = nTime;
-        
-    else
-        
-        nOut = trimOutput(nTime);
-        
-    end
+%     nTime = round(tauf/dtau);
+%     
+%     if nTime < 1000
+%         
+%         nTime = 1000;
+%         dtau = tauf/nTime;
+%         nOut = nTime;
+%         
+%     else
+%         
+%         nOut = trimOutput(nTime);
+%         
+%     end
     
-    Omega = sqrt(4*beta*Theta*dtau);
+%     Omega = sqrt(4*beta*Theta*dtau);
     
     % Calculate the initial condition
     
-    [ phi0, rho0 ] = makeIC(N, geometry, beta, Omega);
+    [ phi0, rho0 ] = makeIC(N, geometry);
     
     % Annoyingly, while the initial conditions must be column vectors, ode45
     % makes the output variables row vectors (with time being the column
@@ -63,8 +64,7 @@ function FKModel(varargin)
             
         end
         
-        [ tau, phi, rho, phiAvg, rhoAvg ] = solveFK(tauf, nTime, nOut, phi0, ...
-            rho0, beta, Omega, method);
+        [ tau, phi, rho ] = solveFK(tauf, dtau, 1000, phi0, rho0, beta, true, method);
         
     else
         
@@ -82,9 +82,9 @@ function FKModel(varargin)
     
     writePathName = makePath(pathFormats, pathValues, []);
     
-    saveDynamics(writePathName, geometry, runNumber, tau, phi, rho, phiAvg, rhoAvg);
+    saveDynamics(writePathName, geometry, runNumber, tau, phi, rho);
     
-    clear tau rho phi rhoAvg phiAvg rho0 phi0 ans method varargin runNumber
+    clear tau rho phi rho0 phi0 ans method varargin runNumber
     
     save(sprintf('%s/%sConstants', writePathName, geometry))
     

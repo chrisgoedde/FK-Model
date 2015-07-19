@@ -1,15 +1,33 @@
-function [ t, phif, rhof, phiSum, rhoSum ] ...
-        = solveFK(tf, nTime, nOut, phi0, rho0, beta, Omega, method)
+function [ t, phif, rhof ] ...
+        = solveFK(tauf, dtau, minOut, phi0, rho0, beta, drivingFlag, method)
+    
+    load(FKDefaults, 'Theta');
     
     y0 = [ phi0; rho0 ];
     N = length(phi0);
     
+    nTime = round(tauf/dtau);
+    
+    if nTime < minOut
+        
+        nTime = minOut;
+        dtau = tauf/nTime;
+        nOut = nTime;
+        
+    else
+        
+        nOut = trimOutput(nTime);
+        
+    end
+    
+    Omega = sqrt(4*beta*Theta*dtau);
+    
     muVector = ones(N, 1);
     deltaVector = 1./muVector;
     
-    initSpringForce(true);
-    initSubstrateForce(true);
-    initDrivingForce(true);
+    initSprings(true);
+    initSubstrate(true);
+    initDriving(true);
     
     UL = zeros(N);
     UR = diag(ones(1,N));
@@ -21,21 +39,17 @@ function [ t, phif, rhof, phiSum, rhoSum ] ...
     
     options = odeset('JPattern', pattern);
     
-    t = linspace(0, tf, nTime+1);
+    t = linspace(0, tauf, nTime+1);
     
     nStep = nTime/nOut;
     
     z0 = y0;
     y = zeros(nOut+1, 2*N);
-    ySum = zeros(nOut+1, 2*N);
     y(1, :) = y0;
-    ySum(1, :) = y0;
     
     tic
     
     for i = 1:nOut;
-        
-        zSum = zeros(2*N, 1);
         
         for j = 1:nStep
             
@@ -44,12 +58,10 @@ function [ t, phif, rhof, phiSum, rhoSum ] ...
             timeIndex = (i-1)*nStep + j;
             [ ~, z ] = method(@FK, [ t(timeIndex) t(timeIndex+1) ], z0, options);
             z0 = z(end, :)';
-            zSum = zSum + z0;
             
         end
         
         y(i+1, :) = z(end, :);
-        ySum(i+1, :) = zSum/nStep;
         if mod((i+1), round(nOut/10)) == 0
             
             elapsed = toc/60;
@@ -76,9 +88,6 @@ function [ t, phif, rhof, phiSum, rhoSum ] ...
     phif = y(:, 1:N)';
     rhof = y(:, N+1:2*N)';
     
-    phiSum = ySum(:, 1:N)';
-    rhoSum = ySum(:, N+1:2*N)';
-    
     function dy = FK(tau, y0)
         
         phi = y0(1:N);
@@ -90,13 +99,47 @@ function [ t, phif, rhof, phiSum, rhoSum ] ...
         
         c = -beta*rho;
         
-        d = makeDrivingForce(tau, phi);
+        d = makeDrivingForce(tau, phi, drivingFlag);
         
         e = makeSubstrateForce(phi);
         
         drho = a + b + c + d + e;
         
         dy = [ dphi ; drho ];
+        
+    end
+    
+    function nOut = trimOutput(nTime)
+        
+        nOut = nTime;
+        
+        while nOut > 1000
+            
+            factor = nTime/1000;
+            
+            if round(factor) == factor
+                
+                nOut = nTime/factor;
+                
+            else
+                
+                if nOut < 2000
+                    
+                    nOut = nOut/2;
+                    
+                elseif nOut < 5000
+                    
+                    nOut = nOut/5;
+                    
+                else
+                    
+                    nOut = nOut/10;
+                    
+                end
+                
+            end
+            
+        end
         
     end
     

@@ -1,15 +1,15 @@
-function saveDynamics(thePath, geometry, runNumber, tau, phi, rho, phiAvg, rhoAvg) %#ok<INUSD>
-
-if ~exist(thePath, 'dir')
+function saveDynamics(thePath, geometry, runNumber, tau, phi, rho) %#ok<INUSD>
     
-    mkdir(thePath);
+    if ~exist(thePath, 'dir')
+        
+        mkdir(thePath);
+        
+    end
     
-end
+    savefileName = sprintf('%s/%sDynamics-%d.mat', thePath, geometry, runNumber);
     
-savefileName = sprintf('%s/%sDynamics-%d.mat', thePath, geometry, runNumber);
+    save(savefileName, 'tau', 'phi', 'rho')
     
-save(savefileName, 'tau', 'phi', 'rho', 'phiAvg', 'rhoAvg')
-
-fprintf('Saved data to %s.\n', savefileName)
-
+    fprintf('Saved data to %s.\n', savefileName)
+    
 end
