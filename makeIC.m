@@ -12,8 +12,16 @@ function [ phi0, rho0 ] = makeIC(N, geometry)
         stretch = str2double(geometry(2:end));
         if stretch ~= 0 || M == 0
             
-            [ phi0, rho0 ] = solitonIC(N, 0, stretch, wF, epsilon, beta, gamma, 0);
+            if stretch < 0
             
+                [ phi0, rho0 ] = solitonIC(N, abs(stretch), 0, wF, epsilon, beta, gamma, 0);
+                
+            else
+                
+                [ phi0, rho0 ] = solitonIC(N, 0, stretch, wF, epsilon, beta, gamma, 0);
+                
+            end
+     
         else
             
             phi0 = wF * substrateMinima(N, M, Lambda);
@@ -26,7 +34,15 @@ function [ phi0, rho0 ] = makeIC(N, geometry)
         stretch = str2double(geometry(2:end));
         if stretch ~= 0 || M == 0
             
-            [ phi0, rho0 ] = solitonIC(N, 0, stretch, wF, epsilon, beta, gamma, 0);
+            if stretch < 0
+            
+                [ phi0, rho0 ] = solitonIC(N, abs(stretch), 0, wF, epsilon, beta, gamma, 0);
+                
+            else
+                
+                [ phi0, rho0 ] = solitonIC(N, 0, stretch, wF, epsilon, beta, gamma, 0);
+                
+            end
             
         else
             
@@ -37,7 +53,7 @@ function [ phi0, rho0 ] = makeIC(N, geometry)
         
         fprintf('Equilibrating initial condition ...\n')
         
-        [ ~, phi, rho ] = solveFK(500, 1, 100, phi0, rho0, 0.01, false, @ode45);
+        [ ~, phi, rho ] = solveFK(500, 1, 100, phi0, rho0, 0.01, false, @ode45, false);
         
         phi0 = phi(:, end);
         rho0 = rho(:, end);

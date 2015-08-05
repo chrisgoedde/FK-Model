@@ -8,18 +8,28 @@ function externalForce = makeDrivingForce(tau, phi, drivingFlag)
     
     eVTug = zeros(N, numTimes);
     
-    if taufTug ~= 0  && drivingFlag
+    % If phiTug ~= then we are tugging on the monomer on the far right.
+    
+    if phiTug ~= 0
         
-        endPoint = [ startTug + phiTug*tau/taufTug; startTug + phiTug*ones(size(tau)) ];
-        endPoint = min(endPoint);
+        if taufTug ~= 0  && drivingFlag
+            
+            endPoint = [ startTug + phiTug*tau/taufTug; startTug + phiTug*ones(size(tau)) ];
+            endPoint = min(endPoint);
+            
+        else
+            
+            endPoint = startTug;
+            
+        end
+        
+        eVTug(N, :) = -gammaTug * (phi(N, :) - endPoint);
         
     else
         
-        endPoint = startTug + phiTug*ones(size(tau));
+        eVTug(N, :) = 0;
         
     end
-    
-    eVTug(N, :) = -gammaTug * (phi(N, :) - endPoint);
     
     if drivingFlag
         

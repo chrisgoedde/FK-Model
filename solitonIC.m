@@ -49,6 +49,6 @@ function [ u, v ] = solitonIC(N, numKinks, numAntikinks, wF, epsilon0, beta, gam
     % plot(moleculeIndex, v, 'o')
     
     u = u + 2*pi*wF * (0:(N-1))';
-    u = u - 2*pi * numKinks;
+    u = u - 2*pi * numAntikinks;
     
 end

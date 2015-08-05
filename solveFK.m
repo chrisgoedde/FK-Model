@@ -1,7 +1,12 @@
-function [ t, phif, rhof ] ...
-        = solveFK(tauf, dtau, minOut, phi0, rho0, beta, drivingFlag, method)
+function [ t, phif, rhof ] = solveFK(tauf, dtau, minOut, phi0, rho0, beta, drivingFlag, method, dispFlag)
     
     load(FKDefaults, 'Theta');
+    
+    if isempty(beta)
+        
+        load(FKDefaults, 'beta');
+        
+    end
     
     y0 = [ phi0; rho0 ];
     N = length(phi0);
@@ -20,10 +25,10 @@ function [ t, phif, rhof ] ...
         
     end
     
-    Omega = sqrt(4*beta*Theta*dtau);
-    
     muVector = ones(N, 1);
     deltaVector = 1./muVector;
+
+    Omega = sqrt(2*beta*muVector*Theta*dtau);
     
     initSprings(true);
     initSubstrate(true);
@@ -53,7 +58,7 @@ function [ t, phif, rhof ] ...
         
         for j = 1:nStep
             
-            z0 = z0 + Omega*[ zeros(N,1) ; randn(N,1) ];
+            z0 = z0 + [ Omega ; Omega ] .* [ zeros(N,1) ; randn(N,1) ];
             
             timeIndex = (i-1)*nStep + j;
             [ ~, z ] = method(@FK, [ t(timeIndex) t(timeIndex+1) ], z0, options);
@@ -62,7 +67,7 @@ function [ t, phif, rhof ] ...
         end
         
         y(i+1, :) = z(end, :);
-        if mod((i+1), round(nOut/10)) == 0
+        if mod((i+1), round(nOut/10)) == 0 && dispFlag
             
             elapsed = toc/60;
             percent = round(i*100.0/nOut);
