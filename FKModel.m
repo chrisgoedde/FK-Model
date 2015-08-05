@@ -4,38 +4,26 @@ function FKModel(varargin)
     
     tStart = tic;
     
-    % geometry = [];
+    % Initialize the input parameters. This returns the formats and values
+    % necessary to read/write the output files, and an integer run number
+    % to distinguish different simulation runs. It writes all the other
+    % parameters to the local FKDefaults file for use by this and other
+    % functions. Since we're about to do a simulation, we force the 'Save
+    % Type' to be 'Data'.
     
-    % Initialize the input parameters.
+    [ pathFormats, pathValues, runNumber ] = parseArguments(varargin{:}, 'Save Type', 'Data');
     
-    [ pathFormats, pathValues, runNumber ] = parseArguments(varargin{:});
+    load(FKDefaults, 'N0', 'S', 'tauf', 'methodName', 'geometry')
     
-    load(FKDefaults, 'N0', 'S', 'Theta', 'tauf', 'beta', 'methodName', 'geometry')
+    % set the step size for the thermal noise. This might be changed by
+    % solveFK to ensure that the output is written at enough different
+    % times during the simulation.
     
-    % Time step information
+    dtau = 0.1; 
     
-    N = N0+S;
-    dtau = 0.1; % Step size for the thermal noise
+    % Calculate the initial condition.
     
-%     nTime = round(tauf/dtau);
-%     
-%     if nTime < 1000
-%         
-%         nTime = 1000;
-%         dtau = tauf/nTime;
-%         nOut = nTime;
-%         
-%     else
-%         
-%         nOut = trimOutput(nTime);
-%         
-%     end
-    
-%     Omega = sqrt(4*beta*Theta*dtau);
-    
-    % Calculate the initial condition
-    
-    [ phi0, rho0 ] = makeIC(N, geometry);
+    [ phi0, rho0 ] = makeIC(N0 + S, geometry);
     
     % Annoyingly, while the initial conditions must be column vectors, ode45
     % makes the output variables row vectors (with time being the column
@@ -64,7 +52,15 @@ function FKModel(varargin)
             
         end
         
-        [ tau, phi, rho ] = solveFK(tauf, dtau, 1000, phi0, rho0, beta, true, method);
+        % solveFK takes the final time and time step (dimensionless), the
+        % minimum number of output times, the initial position and velocity
+        % of the molecules, the damping ([] means to read the damping from
+        % the FKDefaults file), a flag to determine whether the driving
+        % force is on or off, and the integration method. The last argument
+        % is a flag that specifies whether progress should be written to
+        % the command line.
+        
+        [ tau, phi, rho ] = solveFK(tauf, dtau, 1000, phi0, rho0, [], true, method, true);
         
     else
         
@@ -84,9 +80,9 @@ function FKModel(varargin)
     
     saveDynamics(writePathName, geometry, runNumber, tau, phi, rho);
     
-    clear tau rho phi rho0 phi0 ans method varargin runNumber
+    % clear tau rho phi rho0 phi0 ans method varargin runNumber
     
-    save(sprintf('%s/%sConstants', writePathName, geometry))
+    % save(sprintf('%s/%sConstants', writePathName, geometry))
     
     elapsed = toc(tStart)/60;
     

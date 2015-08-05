@@ -1,29 +1,26 @@
 function animateFK(saveMovie, varargin)
     
-    [ pathFormats, pathValues, runNumber ] = parseArguments(varargin{:});
+    [ pathFormats, pathValues, runNumber ] = parseArguments(varargin{:}, 'Save Type', 'Data');
     [ unit ] = setPhysicalConstants(varargin{:});
     
-    load(FKDefaults, 'geometry', 'alpha')
-    wF = round(alpha/(2*pi));
-    
+    load(FKDefaults, 'geometry', 'alpha', 'wF', 'N0', 'S')
+
     readPathName = makePath(pathFormats, pathValues, []);
     
-    if ~exist(sprintf('%s/%sConstants.mat', readPathName, geometry), 'file')
+    if ~exist(sprintf('%s', readPathName), 'dir')
         
-        fprintf('No appropriate run at %s.\n', readPathName);
+        fprintf('No appropriate folder at %s.\n', readPathName);
         return
         
     end
-    
-    load(sprintf('%s/%sConstants.mat', readPathName, geometry));
-    
+        
     [ tau, phi, ~ ] = loadDynamics(readPathName, geometry, runNumber);
     
     [ stretch, offset ] = findChainPosition(phi, wF);
     
     theTitle = makeTitle(unit, runNumber);
     
-    moleculeIndex = (1:N)';
+    moleculeIndex = (1:N0+S)';
     
     fH = figure('KeyPressFcn', @startAnimation);
     
@@ -43,7 +40,7 @@ function animateFK(saveMovie, varargin)
     pos(4) = 0.70;
     set(gca, 'Position', pos)
     
-    set(gca, 'xlim', [ 0 N ])
+    set(gca, 'xlim', [ 0 N0+S ])
     
     yMax = ceil(max(max(offset)/(2*pi*wF)));
     yMin = floor(min(min(offset)/(2*pi*wF)));

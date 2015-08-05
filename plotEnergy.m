@@ -3,20 +3,21 @@ function plotEnergy(varargin)
     [ pathFormats, pathValues, runNumber ] = parseArguments(varargin{:});
     [ unit ] = setPhysicalConstants(varargin{:});
     
-    load(FKDefaults, 'geometry')
+    load(FKDefaults, 'geometry', 'N0', 'S')
+    N = N0 + S;
     
     readPathName = makePath(pathFormats, pathValues, []);
     
     fontSize = 14;
     
-    if ~exist(sprintf('%s/%sConstants.mat', readPathName, geometry), 'file')
-        
-        fprintf('No appropriate run at %s.\n', readPathName);
-        return
-        
-    end
-    
-    load(sprintf('%s/%sConstants.mat', readPathName, geometry));
+%     if ~exist(sprintf('%s/%sConstants.mat', readPathName, geometry), 'file')
+%         
+%         fprintf('No appropriate run at %s.\n', readPathName);
+%         return
+%         
+%     end
+%     
+%     load(sprintf('%s/%sConstants.mat', readPathName, geometry));
     
     [ tau, phi, rho ] = loadDynamics(readPathName, geometry, runNumber);
     
@@ -28,7 +29,7 @@ function plotEnergy(varargin)
     %
     % end
     
-    [ KE, PE ] = findChainEnergy(phi, rho, alphaVector, deltaVector, gammaVector);
+    [ KE, PE ] = findChainEnergy(phi, rho);
     
     theTitle = makeTitle(unit, runNumber);
     
