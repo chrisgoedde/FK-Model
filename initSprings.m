@@ -4,7 +4,7 @@ function [ aVOut, gVOut ] = initSprings(initFlag)
     
     if initFlag
         
-        load(FKDefaults, 'N0', 'S', 'geometry', 'alpha', 'gamma')
+        load(FKDefaults, 'N0', 'S', 'geometry', 'alpha', 'gamma', 'wF')
         
         N = N0 + S;
         
@@ -23,7 +23,7 @@ function [ aVOut, gVOut ] = initSprings(initFlag)
         else
             
             gammaVector = gamma * ones(N, 1);
-            alphaVector(1) = alphaVector(1) - 2*pi * N0;
+            alphaVector(1) = alphaVector(1) - 2*pi * wF * N0;
             
         end
         

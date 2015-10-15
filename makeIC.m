@@ -1,6 +1,6 @@
 function [ phi0, rho0 ] = makeIC(N, geometry)
     
-    load(FKDefaults, 'alpha', 'gamma', 'M', 'Lambda', 'epsilon', 'beta', 'wF')
+    load(FKDefaults, 'alpha', 'gamma', 'M', 'Lambda', 'epsilon', 'beta', 'wF', 'S')
 
     if strcmp(geometry, 'chain')
         
