@@ -1,115 +1,84 @@
 function plotVvF(varargin)
-
-[ pathFormats, pathValues, ~ ] = parseArguments(varargin{:});
-
-load(FKDefaults, 'N0', 'eta', 'S', 'geometry')
-
-topPathName = makePath(pathFormats, pathValues, 'eta =');
-
-fileList = dir(topPathName);
-
-[ bathTempList, bathTempFolder ] = getFoldersAndValues(fileList, 'T =');
-
-figHandle = [];
-styleArray = { '*', 'o', 's', 'd', '+', 'v' };
-cM = colormap(lines);
-numLegends = 1;
-
-if isempty(bathTempList)
     
-    disp('No data files found!')
-    return
+    [ pathFormats, pathValues, ~ ] = parseArguments(varargin{:});
+    [ unit ] = setPhysicalConstants(varargin{:});
     
-end
-
-for j = 1:length(bathTempList)
+    load(FKDefaults, 'geometry')
     
-    pathValues{5} = bathTempList(j);
+    [ TempValues, TempIndex ] = findValues('Theta =', pathFormats, pathValues);
     
-    midPathName = makePath(pathFormats, pathValues, 'S =');
-    fileList = dir(midPathName);
-    
-    [ forceList, ~ ] = getFoldersAndValues(fileList, 'f =');
-    
-    velocity = zeros(1, length(forceList));
-    velDev = zeros(1, length(forceList));
-    
-    fCount = 1;
-    while fCount <= length(forceList)
+    if isempty(TempValues)
         
-        pathValues{7} = forceList(fCount);
-        newPathName = makePath(pathFormats, pathValues, []);
+        disp('No data files found!')
+        return
         
-        fprintf('Looking for path %s\n', newPathName)
-        if exist(newPathName, 'file')
+    end
+    
+    for i = 1:length(TempValues)
+        
+        pathValues{TempIndex} = TempValues{i};
+        
+        [ ForceValues, ForceIndex ] = findValues('epsilon =', pathFormats, pathValues);
+        % ForceValues = ForceValues(1:end-3);
+        ForceValues = sort(cell2mat(ForceValues));
+        ForceValues = ForceValues(2:end);
+        disp(ForceValues)
+        
+        for j = 1:length(ForceValues)
             
-            fprintf('Loading file %s/ringConstants.mat\n', newPathName)
-            load(sprintf('%s/ringConstants.mat', newPathName), 'p0', 'mAvg', 'a', 'g')
+            pathValues{ForceIndex} = ForceValues(j);
+            readPathName = makePath(pathFormats, pathValues, []);
             
-            [ flowRate, numSets ] = getFlowRates(newPathName, geometry);
-            
-            velocity(fCount) = p0*mean(flowRate)/mAvg;
-            velDev(fCount) = p0*std(flowRate)/mAvg;
-            fCount = fCount+1;
-            
-        else
-            
-            for k = fCount+1:length(forceList)
+            if ~exist(sprintf('%s', readPathName), 'dir')
                 
-                forceList(k-1) = forceList(k);
-                velocity(k-1) = velocity(k);
-                velDev(k-1) = velDev(k);
+                fprintf('No appropriate folder at %s.\n', readPathName);
                 
             end
             
-            forceList = forceList(1:end-1);
-            velocity = velocity(1:end-1);
-            velDev = velDev(1:end-1);
+            for r = 1:5
             
-        end
-        
-        
-    end
-    
-    if ~isempty(forceList)
-        
-        if isempty(figHandle)
+                [ ~, ~, rho ] = loadDynamics(readPathName, geometry, r);
+                flowRate(r, i, j) = mean(mean(rho(:, 251:1001))); %#ok<AGROW>
+                if flowRate(r, i, j) < 0
+                    fprintf('flow rate is negative for run %d, with force %.3f pN and temperature %.0f\n', ...
+                        r, ForceValues(j)*unit.forceFactor{2}, TempValues{i}*unit.tempFactor{2}), pause
+                elseif 10*flowRate(r, i, j)*unit.velocityFactor{2} > 450
+                    fprintf('flow rate is too large for run %d, with force %.3f pN and temperature %.0f\n', ...
+                        r, ForceValues(j)*unit.forceFactor{2}, TempValues{i}*unit.tempFactor{2}), pause
+                end
+                
+            end
+            force(i, j) = ForceValues(j); %#ok<AGROW>
             
-            figHandle = figure;
-            
-            soliton = (2*abs(S)/(2*N0))*mean(a)*sqrt(mean(g)/mAvg)./sqrt(1+(4*p0*eta./(pi*forceList*1e-12)).^2);
-            loglog(forceList, soliton, '*m', 'linewidth', 2), hold on
-            
-            set(gca, 'fontsize', 14)
-            xlabel('force (pN)')
-            ylabel('flow rate (m/s)')
-            
-            theTitle = makePlotTitle(alpha, gamma, varargin{:});
-            title(theTitle)
-            
-            legendArray{1} = 'Theory';
-            
-        end
-        
-        numLegends = numLegends + 1;
-
-%         loglog(forceList, velocity, styleArray{j}, 'linewidth', 2)
-        
-        errorbar(forceList, velocity, velDev, styleArray{mod(numLegends-1,length(styleArray))+1}, ...
-            'linewidth', 2, 'color', cM(mod(numLegends-1, 7)+1,:))
-        if numSets > 2
-            legendArray{numLegends} = sprintf('%s (%d runs)', bathTempFolder{j}, numSets-1); %#ok<AGROW>
-        else
-            legendArray{numLegends} = sprintf('%s (%d run)', bathTempFolder{j}, numSets-1); %#ok<AGROW>
         end
         
     end
+    fR = squeeze(mean(flowRate));
     
-end
-
-set(gca, 'ylim', [ 0.1 1000 ]);
-grid on, box on, grid minor
-
-legend(legendArray, 'location', 'best')
-
+    lineType = { '-o', '-d', '-s', '-v' };
+    
+    figure
+    for i = 1:length(TempValues)
+        
+        [ f, index ] = sort(force(i, :));
+        
+        flowRate = min(447, 10*fR(i, index)*unit.velocityFactor{2});
+        loglog(f*unit.forceFactor{2}, flowRate, lineType{i})
+        hold on
+        
+    end
+    
+    axis([ 1e-3 10 1 1000 ])
+    % set(gca, 'fontsize', 14)
+    xlabel('force (pN)')
+    ylabel('flow rate (A/ns)')
+    
+    grid on, % grid minor
+    grid minor
+    grid minor
+    set(gca, 'fontsize', 8)
+    legend('T = 5 K', 'T = 20 K', 'T = 75 K', 'T = 300 K', 'location', 'southeast')
+    setPrintSize(3.5, 2, true)
+    makePrint('.', 'flowRate', 'pdf', 'true')
+    
 end
