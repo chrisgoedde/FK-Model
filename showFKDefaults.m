@@ -27,5 +27,9 @@ function showFKDefaults
     disp([ 'Duration = ' num2str(tauf, '%.1f') ])
     disp([ 'Integration Method = ' methodName ])
     disp([ 'Geometry = ' geometry ])
+    if strcmp(geometry, 'fixed')
+        disp([ 'Fixed Ends = (' num2str(fixedEnds(1), '%.2f') ', ' ...
+            num2str(fixedEnds(2), '%.2f') ')' ])
+    end
     
 end

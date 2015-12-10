@@ -19,7 +19,7 @@ function [ pathFormats, pathValues, runNumber ] = parseArguments(varargin)
     % 'Save Folder' -> sets folderName
     % 'Save Type' -> sets folderType
     % 'Run' -> sets runNumber
-    % 'Geometry' -> set geometry to 'ring' or 'chain'
+    % 'Geometry' -> set geometry to 'ring', 'chain', 'sN', 'eN', 'fixed'
     % 'Push' -> set nPush
     % 'Push Force' -> set epsilonPush
     % 'Push Start' -> set tau0Push
@@ -35,6 +35,7 @@ function [ pathFormats, pathValues, runNumber ] = parseArguments(varargin)
     % 'Tug End' -> set taufTug to pulling duration
     % 'Tug Spring' -> set strength of tugging spring, gammaTug
     % '2D Spring' -> set transverse spring constant for 2D FK model
+    % 'Fixed Ends' -> set the locations of the ends for fixed ends
     
     runNumber = 1; % default run number for reading in data
     
@@ -110,6 +111,10 @@ function [ pathFormats, pathValues, runNumber ] = parseArguments(varargin)
                 %
                 %             gamma2D = theValue;
                 
+            case 'Fixed Ends'
+                
+                fixedEnds = theValue; %#ok<NASGU>
+                
             case 'Push'
                 
                 nPush = theValue;
@@ -178,11 +183,7 @@ function [ pathFormats, pathValues, runNumber ] = parseArguments(varargin)
     % If we are using a periodic tube, we must have a uniform substrate, and we
     % don't push or pull the (nonexistent) ends of the chain.
     
-    if ~strcmp(geometry, 'ring')
-        
-        S = 0;
-        
-    else
+    if strcmp(geometry, 'ring')
         
         M = 0;
         Lambda = 1;
@@ -190,6 +191,10 @@ function [ pathFormats, pathValues, runNumber ] = parseArguments(varargin)
         dTug = 0;
         nPull = 0;
         nPush = 0;
+        
+    else
+        
+        S = 0;
         
     end
     
@@ -281,13 +286,17 @@ function [ pathFormats, pathValues, runNumber ] = parseArguments(varargin)
         'methodName', 'geometry', 'folderName', 'folderType', ...
         'nPush', 'epsilonPush', 'tau0Push', 'taufPush', ...
         'nPull', 'epsilonPull', 'tau0Pull', 'taufPull', 'M', 'Lambda', 'Psi', ...
-        'dTug', 'taufTug', 'gammaTug');
+        'dTug', 'taufTug', 'gammaTug', 'fixedEnds');
     
     % Make a cell array for the path for reading/writing the data.
     
     if strcmp(geometry, 'ring')
         
         BC = 'ring';
+        
+    elseif strcmp(geometry, 'fixed')
+        
+        BC = 'fixed';
         
     else
         

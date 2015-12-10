@@ -2,21 +2,30 @@ function [ KE, PE ] = findChainEnergy(phi, rho)
     
     [ N, numTimes ] = size(phi);
     
-    [ alphaVector, gammaVector ] = initSprings(true);
+    [ alphaVector, gammaVector, fixedE ] = initSprings(true);
     
     muVector = ones(N, 1);
     deltaVector = 1./muVector;
     
     alphaVector = repmat(alphaVector, [ 1 numTimes ]);
-    stretch = (phi - circshift(phi, 1) - alphaVector);
     
     deltaVector = repmat(deltaVector, [ 1 numTimes ]);
     KE = sum(deltaVector.*(rho.^2)/2);
     
     gammaVector = repmat(gammaVector, [ 1 numTimes ]);
     
-    springForceLeft = -gammaVector.*stretch;
-    springPotential = sum(0.5 * (-springForceLeft.*stretch));
+    if isempty(fixedE)
+        
+        stretch = (phi - circshift(phi, 1) - alphaVector);
+        springForceLeft = -gammaVector.*stretch;
+        springPotential = sum(0.5 * (-springForceLeft.*stretch));
+        
+    else
+        
+        stretch = phi(2:end, :) - phi(1:end-1, :) - alphaVector(1:end-1, :);
+        springPotential = sum(0.5 * gammaVector(1:end-1, :).*stretch.^2);
+        
+    end
         
     [ M, Lambda, Psi ] = initSubstrate(true);
     substratePotential = sum((1-cos(phi)) .* (phi <= 2*pi*M) ...
